@@ -4,9 +4,11 @@ project(APCPPLib)
 set(CMAKE_CXX_STANDARD 14)
 
 include_directories(
-        lib/src/Exception
-        include)
+  lib/src/Exception
+  lib/src/Log
+  include)
 
 add_executable(APCPPLib
-        lib/src/Exception/Exception.cpp
-        src/main.cpp)
+  lib/src/Exception/Exception.cpp
+  lib/src/Log/Logger.cpp
+  src/main.cpp)

@@ -1,17 +1,10 @@
 #include <vector>
-#include "Exception.hpp"
-
-void func()
-{
-    throw Log::Exception("Malloc buffer invalid", "func");
-}
+#include "Logger.hpp"
 
 int main()
 {
-    try {
-        func();
-    } catch (Log::Exception &except) {
-        except.debugErrorMessage();
-    }
+    Debug::Logger log;
+
+    log.generateDebugMessage(Debug::INFO, "no errors", "main");
 	return 0;
 }
