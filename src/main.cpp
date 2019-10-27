@@ -3,8 +3,8 @@
 
 int main()
 {
-    Debug::Logger log;
+    Debug::Logger *log = Debug::Logger::getInstance();
 
-    log.generateDebugMessage(Debug::INFO, "no errors", "main");
-	return 0;
+    log->generateDebugMessage(Debug::ERROR, "Error", "main");
+    return 0;
 }
