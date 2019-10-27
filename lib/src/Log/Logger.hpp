@@ -11,6 +11,7 @@
 #include <queue>
 #include <mutex>
 #include <string>
+#include <memory>
 #include <thread>
 #include <fstream>
 #include <iostream>
@@ -35,24 +36,13 @@ namespace Debug {
             Logger(const Logger&) = delete;
             Logger& operator=(const Logger&) = delete;
 
-            // Singleton instance.
-            static Logger *getInstance(const std::string &filePath)
+            // Singleton instance and dtor.
+            ~Logger();
+            static Logger *getInstance(const std::string &filePath = DEFAULT_LOG_FILE)
             {
-                if (!_singleton)
-                    _singleton = new Logger(filePath, FILE);
-                return _singleton;
-            }
-            static Logger *getInstance()
-            {
-                if (!_singleton)
-                    _singleton = new Logger(STANDARD);
-                return _singleton;
-            }
-            static void stopInstance()
-            {
-                if (!_singleton)
-                    return;
-                _singleton->stopThread();
+                static std::unique_ptr<Logger> loggerObject(new Logger(filePath, STANDARD));
+
+                return loggerObject.get();
             }
 
             void switchMode(mode mode, const std::string &filePath = std::string());
@@ -64,16 +54,12 @@ namespace Debug {
         private:
             Logger(const std::string &filepath, mode mode = FILE);
             Logger(mode mode = STANDARD);
-            ~Logger();
 
             void writeContent();
-            void stopThread();
             void generateMessageInFile(type type, const std::string &message, const std::string &where);
             void generateMessageOnStandardOutput(type type, const std::string &message, const std::string &where);
             std::string getMessageFromType(type type) {return type == INFO ? INFO_MESSAGE : type == WARNING ? WARNING_MESSAGE : ERROR_MESSAGE;};
             std::string getMessageColorFromType(type type) {return type == INFO ? GREEN : type == WARNING ? YELLOW : RED;};
-
-            static Logger *_singleton;
 
             mode _mode;
             std::ofstream _file;
