@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
+set(CMAKE_CXX_STANDARD 14)
 project(APCPPLib)
 
+add_compile_options(-g)
 find_package(Threads)
-set(CMAKE_CXX_STANDARD 14)
 
 include_directories(
   lib/src/Exception

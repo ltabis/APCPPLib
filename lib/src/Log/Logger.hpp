@@ -14,6 +14,7 @@
 #include <thread>
 #include <fstream>
 #include <iostream>
+#include <condition_variable>
 
 #include "macro.hpp"
 
@@ -77,7 +78,14 @@ namespace Debug {
 
             mode _mode;
             std::ofstream _file;
-            std::thread _worker;
             std::queue<std::string> _queue;
+
+            std::thread _worker;
+            std::mutex _queueMutex;
+            std::mutex _coutMutex;
+            std::mutex _notifiedMutex;
+
+            std::condition_variable _condVar;
+            bool _notified;
     };
 }
