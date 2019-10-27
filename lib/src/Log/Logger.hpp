@@ -68,7 +68,6 @@ namespace Debug {
 
             void writeContent();
             void stopThread();
-            void addContentToQueue(std::string message);
             void generateMessageInFile(type type, const std::string &message, const std::string &where);
             void generateMessageOnStandardOutput(type type, const std::string &message, const std::string &where);
             std::string getMessageFromType(type type) {return type == INFO ? INFO_MESSAGE : type == WARNING ? WARNING_MESSAGE : ERROR_MESSAGE;};
@@ -81,11 +80,10 @@ namespace Debug {
             std::queue<std::string> _queue;
 
             std::thread _worker;
-            std::mutex _queueMutex;
-            std::mutex _coutMutex;
             std::mutex _notifiedMutex;
 
             std::condition_variable _condVar;
             bool _notified;
+            bool _isWorkerActive;
     };
 }

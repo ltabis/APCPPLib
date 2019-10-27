@@ -14,11 +14,11 @@ Debug::Logger *Debug::Logger::_singleton = nullptr;
  *   Construcor / Destructor.
  */
 
-Debug::Logger::Logger(mode mode) : _mode(mode), _file(DEFAULT_LOG_FILE), _notified(false)
+Debug::Logger::Logger(mode mode) : _mode(mode), _file(DEFAULT_LOG_FILE), _notified(false), _isWorkerActive(true)
 {
     _worker = std::thread(&Logger::writeContent, this);
 }
-Debug::Logger::Logger(const std::string &filePath, mode mode) : _mode(mode), _file(filePath), _notified(false)
+Debug::Logger::Logger(const std::string &filePath, mode mode) : _mode(mode), _file(filePath), _notified(false), _isWorkerActive(true)
 {
     _worker = std::thread(&Logger::writeContent, this);
 }
@@ -44,24 +44,27 @@ void Debug::Logger::switchMode(mode mode, const std::string &filePath)
 
 void Debug::Logger::writeContent()
 {
-    std::lock_guard<std::mutex> lock(_queueMutex);
-    if (!_queue.empty() && _notified) {
-        if (_mode != OFF) {
+    std::unique_lock<std::mutex> lock(_notifiedMutex);
+
+    while (_isWorkerActive) {
+        while (!_notified)
+            _condVar.wait(lock);
+        if (_mode == OFF)
+            continue;
+        while (!_queue.empty()) {
             generateDebugMessage(_queue.back());
             _queue.pop();
         }
+    _notified = false;
     }
 }
 
 void Debug::Logger::stopThread()
 {
+    _condVar.notify_one();
+    _isWorkerActive = false;
     _worker.join();
     delete _singleton;
-}
-
-void Debug::Logger::addContentToQueue(std::string message)
-{
-    _queue.push(message);
 }
 
 //// USER ACCESS
@@ -72,36 +75,28 @@ void Debug::Logger::addContentToQueue(std::string message)
 
 void Debug::Logger::generateDebugMessage(type type, const std::string &message, const std::string &where)
 {
-    if (_mode == OFF)
-        return;
-    else if (_mode == STANDARD)
+    if (_mode == STANDARD)
         generateMessageOnStandardOutput(type, message, where);
     else if (_mode == FILE)
         generateMessageInFile(type, message, where);
-    std::lock_guard<std::mutex> lock(_notifiedMutex);
-    _notified = true;
     _condVar.notify_one();
+    _notified = true;
 }
 
 void Debug::Logger::generateDebugMessage(const std::string &formated)
 {
-    if (_mode == OFF)
-        return;
-    std::lock_guard<std::mutex> lock(_coutMutex);
     if (_mode == STANDARD)
         std::cout << formated;
     else if (_mode == FILE)
         _file << formated;
-    _notified = false;
 }
-
 
 void Debug::Logger::generateMessageInFile(type type, const std::string &message, const std::string &where)
 {
-    addContentToQueue(getMessageFromType(type) + " " + message +  " in " + where);
+    _queue.push(getMessageFromType(type) + " " + message +  " in " + where);
 }
 
 void Debug::Logger::generateMessageOnStandardOutput(type type, const std::string &message, const std::string &where)
 {
-    addContentToQueue(getMessageColorFromType(type) + getMessageFromType(type) + " " + CYAN + message + WHITE + " in " + MAGENTA + where + WHITE + "\n");
+    _queue.push(getMessageColorFromType(type) + getMessageFromType(type) + " " + CYAN + message + WHITE + " in " + MAGENTA + where + WHITE + "\n");
 }
