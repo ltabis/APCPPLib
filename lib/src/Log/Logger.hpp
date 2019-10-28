@@ -38,7 +38,7 @@ namespace Debug {
     }
 
     typedef enum e_mode {STANDARD, FILE, OFF} mode;
-    typedef enum e_type {INFO, WARNING, ERROR, FATAL} type;
+    typedef enum e_type {INFO, WARNING, ERROR, FATAL, MUNDANE} type;
 
     class Logger {
         public:
@@ -59,8 +59,6 @@ namespace Debug {
             void switchMode(mode mode, const std::string &filePath = std::string());
             void generateDebugMessage(type type, const std::string &message, const std::string &where);
             void generateDebugMessage(const std::string &formated);
-
-            void operator<<(const std::string &message);
 
         private:
             Logger(const std::string &filepath, mode mode = FILE);
