@@ -12,8 +12,14 @@
  *   Construcor / Destructor.
  */
 
-Debug::Logger::Logger(mode mode) : _mode(mode), _worker(std::thread(&Logger::writeContent, this)), _notified(false), _isWorkerActive(true) {}
-Debug::Logger::Logger(const std::string &filePath, mode mode) : _mode(mode), _worker(std::thread(&Logger::writeContent, this)), _notified(false), _isWorkerActive(true) {}
+Debug::Logger::Logger(mode mode) : _mode(mode), _notified(false), _isWorkerActive(true)
+{
+    _worker = std::thread(&Logger::writeContent, this);
+}
+Debug::Logger::Logger(const std::string &filePath, mode mode) : _mode(mode), _notified(false), _isWorkerActive(true)
+{
+    _worker = std::thread(&Logger::writeContent, this);
+}
 
 Debug::Logger::~Logger()
 {
@@ -82,10 +88,25 @@ void Debug::Logger::generateDebugMessage(const std::string &formated)
 
 void Debug::Logger::generateMessageInFile(type type, const std::string &message, const std::string &where)
 {
-    _queue.push(getMessageFromType(type) + " " + message +  " in " + where + "\n");
+    _queue.push(getCurrentTimeString() +
+                getMessageFromType(type) + " " + message +  " in " + where + "\n");
 }
 
 void Debug::Logger::generateMessageOnStandardOutput(type type, const std::string &message, const std::string &where)
 {
-    _queue.push(getMessageColorFromType(type) + getMessageFromType(type) + " " + CYAN + message + WHITE + " in " + MAGENTA + where + WHITE + "\n");
+    _queue.push(getCurrentTimeString() +
+                getMessageColorFromType(type) +
+                getMessageFromType(type) + " " + CYAN + message + WHITE + " in " + MAGENTA + where + WHITE + "\n");
+}
+
+std::string Debug::Logger::getCurrentTimeString()
+{
+    std::ostringstream oss;
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+
+    _time = std::chrono::high_resolution_clock::now();
+    oss << (_mode == FILE ? std::put_time(&tm, "(%d-%m-%Y %Hh %Mm %Ss") : std::put_time(&tm, "(%Hh %Mm %Ss"));
+    oss << " " << std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(_time.time_since_epoch()).count()) << "µs";
+    return _mode == FILE ? oss.str() + ") " : BLUE + oss.str() + ") " + WHITE;
 }

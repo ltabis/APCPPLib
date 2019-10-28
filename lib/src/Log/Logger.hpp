@@ -13,7 +13,9 @@
 #include <string>
 #include <memory>
 #include <thread>
+#include <chrono>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <condition_variable>
 
@@ -26,6 +28,14 @@
 #define INFO_MESSAGE        "[Info]"
 
 namespace Debug {
+
+    // Flags options for the Logger class
+    namespace Flags {
+        #define F_INFO    0
+        #define F_ERROR   1
+        #define F_DEBUG   2
+        #define F_WARNING 3
+    }
 
     typedef enum e_mode {STANDARD, FILE, OFF} mode;
     typedef enum e_type {INFO, WARNING, ERROR} type;
@@ -45,6 +55,7 @@ namespace Debug {
                 return loggerObject.get();
             }
 
+            void setFlags(const std::string &flags);
             void switchMode(mode mode, const std::string &filePath = std::string());
             void generateDebugMessage(type type, const std::string &message, const std::string &where);
             void generateDebugMessage(const std::string &formated);
@@ -56,6 +67,7 @@ namespace Debug {
             Logger(mode mode = STANDARD);
 
             void writeContent();
+            std::string getCurrentTimeString();
             void generateMessageInFile(type type, const std::string &message, const std::string &where);
             void generateMessageOnStandardOutput(type type, const std::string &message, const std::string &where);
             std::string getMessageFromType(type type) {return type == INFO ? INFO_MESSAGE : type == WARNING ? WARNING_MESSAGE : ERROR_MESSAGE;};
@@ -71,5 +83,6 @@ namespace Debug {
             std::condition_variable _condVar;
             bool _notified;
             bool _isWorkerActive;
+            std::chrono::high_resolution_clock::time_point _time;
     };
 }
