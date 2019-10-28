@@ -12,14 +12,8 @@
  *   Construcor / Destructor.
  */
 
-Debug::Logger::Logger(mode mode) : _mode(mode), _notified(false), _isWorkerActive(true)
-{
-    _worker = std::thread(&Logger::writeContent, this);
-}
-Debug::Logger::Logger(const std::string &filePath, mode mode) : _mode(mode), _notified(false), _isWorkerActive(true)
-{
-    _worker = std::thread(&Logger::writeContent, this);
-}
+Debug::Logger::Logger(mode mode) : _mode(mode), _worker(std::thread(&Logger::writeContent, this)), _notified(false), _isWorkerActive(true) {}
+Debug::Logger::Logger(const std::string &filePath, mode mode) : _mode(mode), _worker(std::thread(&Logger::writeContent, this)), _notified(false), _isWorkerActive(true) {}
 
 Debug::Logger::~Logger()
 {
