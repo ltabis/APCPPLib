@@ -12,11 +12,11 @@
  *   Construcor / Destructor.
  */
 
-Debug::Logger::Logger(mode mode) : _mode(mode), _notified(false), _isWorkerActive(true)
+Debug::Logger::Logger(char flags, mode mode) : _mode(mode), _flags(flags), _notified(false), _isWorkerActive(true)
 {
     _worker = std::thread(&Logger::writeContent, this);
 }
-Debug::Logger::Logger(const std::string &filePath, mode mode) : _mode(mode), _notified(false), _isWorkerActive(true)
+Debug::Logger::Logger(const std::string &filePath, char flags, mode mode) : _mode(mode), _flags(flags), _notified(false), _isWorkerActive(true)
 {
     _worker = std::thread(&Logger::writeContent, this);
 }
@@ -29,6 +29,11 @@ Debug::Logger::~Logger()
     _isWorkerActive = false;
     _condVar.notify_one();
     _worker.join();
+}
+
+void Debug::Logger::setFlags(char flags)
+{
+    _flags = flags;
 }
 
 void Debug::Logger::switchMode(mode mode, const std::string &filePath)
@@ -68,15 +73,13 @@ void Debug::Logger::writeContent()
 
 void Debug::Logger::generateDebugMessage(type type, const std::string &message, const std::string &where)
 {
-    if (_mode == STANDARD)
+    if (_mode == STANDARD && !(_flags & (type + 1)))
         generateMessageOnStandardOutput(type, message, where);
-    else if (_mode == FILE)
+    else if (_mode == FILE && !(_flags & (type + 1)))
         generateMessageInFile(type, message, where);
     _condVar.notify_one();
     _notified = true;
 }
-
-#include <exception>
 
 void Debug::Logger::generateDebugMessage(const std::string &formated)
 {
@@ -96,7 +99,7 @@ void Debug::Logger::generateMessageOnStandardOutput(type type, const std::string
 {
     _queue.push(getCurrentTimeString() +
                 getMessageColorFromType(type) +
-                getMessageFromType(type) + " " + CYAN + message + WHITE + " in " + MAGENTA + where + WHITE);
+                getMessageFromType(type) + CYAN + " " + message + WHITE + " in " + MAGENTA + where + WHITE);
 }
 
 std::string Debug::Logger::getCurrentTimeString()

@@ -25,20 +25,18 @@
 #define WARNING_MESSAGE     "[Warning]"
 #define ERROR_MESSAGE       "[Error]"
 #define DEBUG_MESSAGE       "[Debug]"
+#define FATAL_MESSAGE       "[FATAL]"
 #define INFO_MESSAGE        "[Info]"
 
 namespace Debug {
 
     // Flags options for the Logger class
     namespace Flags {
-        #define F_INFO    0
-        #define F_ERROR   1
-        #define F_DEBUG   2
-        #define F_WARNING 3
+        typedef enum e_options {all_on, debug_off, info_off, warning_off, error_off, fatal_off} options;
     }
 
     typedef enum e_mode {STANDARD, FILE, OFF} mode;
-    typedef enum e_type {INFO, WARNING, ERROR, FATAL, MUNDANE} type;
+    typedef enum e_type {DEBUG, INFO, WARNING, ERROR, FATAL} type;
 
     class Logger {
         public:
@@ -48,30 +46,43 @@ namespace Debug {
 
             // Singleton instance and dtor.
             ~Logger();
-            static Logger *getInstance(const std::string &filePath = DEFAULT_LOG_FILE)
+            static Logger *getInstance(mode mode = STANDARD, char flags = Flags::all_on)
             {
-                static std::unique_ptr<Logger> loggerObject(new Logger(filePath, STANDARD));
+                static std::unique_ptr<Logger> loggerObject(new Logger(flags, mode));
+
+                return loggerObject.get();
+            }
+            static Logger *getInstance(const std::string &filePath, char flags = Flags::all_on)
+            {
+                static std::unique_ptr<Logger> loggerObject(new Logger(filePath, flags, FILE));
 
                 return loggerObject.get();
             }
 
-            void setFlags(const std::string &flags);
+            void setFlags(char flags);
             void switchMode(mode mode, const std::string &filePath = std::string());
-            void generateDebugMessage(type type, const std::string &message, const std::string &where);
+            void generateDebugMessage(type type, const std::string &message, const std::string &where = "unknown");
             void generateDebugMessage(const std::string &formated);
 
         private:
-            Logger(const std::string &filepath, mode mode = FILE);
-            Logger(mode mode = STANDARD);
+            Logger(const std::string &filepath, char flags = Flags::all_on, mode mode = FILE);
+            Logger(char flags = Flags::all_on, mode mode = STANDARD);
 
             void writeContent();
             std::string getCurrentTimeString();
             void generateMessageInFile(type type, const std::string &message, const std::string &where);
             void generateMessageOnStandardOutput(type type, const std::string &message, const std::string &where);
-            std::string getMessageFromType(type type) {return type == INFO ? INFO_MESSAGE : type == WARNING ? WARNING_MESSAGE : ERROR_MESSAGE;};
-            std::string getMessageColorFromType(type type) {return type == INFO ? GREEN : type == WARNING ? YELLOW : RED;};
+            std::string getMessageFromType(type type) {return type == INFO ? INFO_MESSAGE :
+                                                              type == WARNING ? WARNING_MESSAGE :
+                                                              type == ERROR ? ERROR_MESSAGE :
+                                                              type == FATAL ? FATAL_MESSAGE : DEBUG_MESSAGE;};
+            std::string getMessageColorFromType(type type) {return type == INFO ? GREEN :
+                                                                   type == WARNING ? YELLOW :
+                                                                   type == ERROR ? RED :
+                                                                   type == FATAL ? REDUNDERLINED : "";};
 
             mode _mode;
+            char _flags;
             std::ofstream _file;
             std::queue<std::string> _queue;
 
