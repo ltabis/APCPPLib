@@ -73,9 +73,9 @@ void Debug::Logger::writeContent()
 
 void Debug::Logger::generateDebugMessage(type type, const std::string &message, const std::string &where)
 {
-    if (_mode == STANDARD && !(_flags & (type + 1)))
+    if (_mode == STANDARD && !(_flags & type))
         generateMessageOnStandardOutput(type, message, where);
-    else if (_mode == FILE && !(_flags & (type + 1)))
+    else if (_mode == FILE && !(_flags & type))
         generateMessageInFile(type, message, where);
     _condVar.notify_one();
     _notified = true;

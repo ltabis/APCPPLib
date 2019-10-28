@@ -32,11 +32,11 @@ namespace Debug {
 
     // Flags options for the Logger class
     namespace Flags {
-        typedef enum e_options {all_on, debug_off, info_off, warning_off, error_off, fatal_off} options;
+        typedef enum e_options {all_on = 1, debug_off = 2, info_off = 4, warning_off = 8, error_off = 16, fatal_off = 32} options;
     }
 
     typedef enum e_mode {STANDARD, FILE, OFF} mode;
-    typedef enum e_type {DEBUG, INFO, WARNING, ERROR, FATAL} type;
+    typedef enum e_type {DEBUG = 2, INFO = 4, WARNING = 8, ERROR = 16, FATAL = 32} type;
 
     class Logger {
         public:
