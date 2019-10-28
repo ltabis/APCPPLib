@@ -38,7 +38,7 @@ namespace Debug {
     }
 
     typedef enum e_mode {STANDARD, FILE, OFF} mode;
-    typedef enum e_type {INFO, WARNING, ERROR} type;
+    typedef enum e_type {INFO, WARNING, ERROR, FATAL} type;
 
     class Logger {
         public:

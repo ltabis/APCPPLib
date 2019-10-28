@@ -81,22 +81,22 @@ void Debug::Logger::generateDebugMessage(type type, const std::string &message, 
 void Debug::Logger::generateDebugMessage(const std::string &formated)
 {
     if (_mode == STANDARD)
-        std::cout << formated;
+        std::cout << formated << std::endl;
     else if (_mode == FILE && _file.is_open())
-        _file << formated;
+        _file << formated << std::endl;
 }
 
 void Debug::Logger::generateMessageInFile(type type, const std::string &message, const std::string &where)
 {
     _queue.push(getCurrentTimeString() +
-                getMessageFromType(type) + " " + message +  " in " + where + "\n");
+                getMessageFromType(type) + " " + message +  " in " + where);
 }
 
 void Debug::Logger::generateMessageOnStandardOutput(type type, const std::string &message, const std::string &where)
 {
     _queue.push(getCurrentTimeString() +
                 getMessageColorFromType(type) +
-                getMessageFromType(type) + " " + CYAN + message + WHITE + " in " + MAGENTA + where + WHITE + "\n");
+                getMessageFromType(type) + " " + CYAN + message + WHITE + " in " + MAGENTA + where + WHITE);
 }
 
 std::string Debug::Logger::getCurrentTimeString()
