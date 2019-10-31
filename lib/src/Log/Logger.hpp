@@ -78,8 +78,8 @@ namespace Debug {
             std::mutex _notifiedMutex;
 
             std::condition_variable _condVar;
-            bool _notified;
-            bool _isWorkerActive;
+            bool _bNotified;
+            bool _bIsWorkerActive;
             std::chrono::high_resolution_clock::time_point _time;
     };
 }

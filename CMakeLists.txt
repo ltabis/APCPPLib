@@ -15,6 +15,11 @@ add_executable(APCPPLib
   lib/src/Exception/Exception.cpp
   lib/src/Log/Logger.cpp
   lib/src/Benchmarking/Breakpoint.cpp
-  src/main.cpp)
+  main.cpp)
+
+add_custom_target(unit_tests ALL
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/
+  COMMAND make
+)
 
 target_link_libraries(APCPPLib ${CMAKE_THREAD_LIBS_INIT})

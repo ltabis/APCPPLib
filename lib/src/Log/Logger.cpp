@@ -12,11 +12,11 @@
  *   Construcor / Destructor.
  */
 
-Debug::Logger::Logger(char flags, mode mode) : _mode(mode), _flags(flags), _notified(false), _isWorkerActive(true)
+Debug::Logger::Logger(char flags, mode mode) : _mode(mode), _flags(flags), _bNotified(false), _bIsWorkerActive(true)
 {
     _worker = std::thread(&Logger::writeContent, this);
 }
-Debug::Logger::Logger(const std::string &filePath, char flags, mode mode) : _mode(mode), _flags(flags), _notified(false), _isWorkerActive(true)
+Debug::Logger::Logger(const std::string &filePath, char flags, mode mode) : _mode(mode), _flags(flags), _file(filePath), _bNotified(false), _bIsWorkerActive(true)
 {
     _worker = std::thread(&Logger::writeContent, this);
 }
@@ -25,8 +25,8 @@ Debug::Logger::~Logger()
 {
     if (_file.is_open())
         _file.close();
-    _notified = true;
-    _isWorkerActive = false;
+    _bNotified = true;
+    _bIsWorkerActive = false;
     _condVar.notify_one();
     _worker.join();
 }
@@ -52,8 +52,8 @@ void Debug::Logger::writeContent()
 {
     std::unique_lock<std::mutex> lock(_notifiedMutex);
 
-    while (_isWorkerActive) {
-        while (!_notified)
+    while (_bIsWorkerActive) {
+        while (!_bNotified)
             _condVar.wait(lock);
         if (_mode == OFF)
             continue;
@@ -61,7 +61,7 @@ void Debug::Logger::writeContent()
             generateDebugMessage(_queue.front());
             _queue.pop();
         }
-    _notified = false;
+    _bNotified = false;
     }
 }
 
@@ -78,7 +78,7 @@ void Debug::Logger::generateDebugMessage(type type, const std::string &message, 
     else if (_mode == FILE && !(_flags & type))
         generateMessageInFile(type, message, where);
     _condVar.notify_one();
-    _notified = true;
+    _bNotified = true;
 }
 
 void Debug::Logger::generateDebugMessage(const std::string &formated)
