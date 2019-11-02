@@ -39,8 +39,9 @@ include(GoogleTest)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
 add_executable(unit_tests
               ${SRC}
+              tests/main.cpp
               tests/Exception/test_exception.cpp
-	      tests/Log/test_logger.cpp)
+	            tests/Log/test_logger.cpp)
 
 ## Linking libraries
 target_link_libraries(APCPPLib ${CMAKE_THREAD_LIBS_INIT})
