@@ -55,9 +55,7 @@ void Debug::Logger::writeContent()
     while (_bIsWorkerActive) {
         while (!_bNotified)
             _condVar.wait(lock);
-        if (_mode == OFF)
-            continue;
-        while (!_queue.empty()) {
+        while (!_queue.empty() && _mode != OFF) {
             generateDebugMessage(_queue.front());
             _queue.pop();
         }

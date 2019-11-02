@@ -25,6 +25,7 @@ TEST(LoggerTests, debugMessageInFile)
 	Debug::Logger *log = Debug::Logger::getInstance("output.txt");
     std::string output;
 
+    log->switchMode(Debug::FILE, "output.txt");
  	log->generateDebugMessage(Debug::INFO, "Info message", "test::debugMessageInFile");
 
 	std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -94,6 +95,8 @@ TEST(LoggerTests, logOff)
     std::string output;
     testing::internal::CaptureStdout();
 
+ 	log->generateDebugMessage(Debug::INFO, "Info message", "test::switchModeTest");
+ 	log->generateDebugMessage(Debug::INFO, "Info message", "test::switchModeTest");
  	log->generateDebugMessage(Debug::INFO, "Info message", "test::switchModeTest");
 	std::this_thread::sleep_for(std::chrono::seconds(1));
     output = testing::internal::GetCapturedStdout();
