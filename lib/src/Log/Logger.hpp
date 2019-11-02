@@ -15,8 +15,9 @@
 #include <thread>
 #include <chrono>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <condition_variable>
 
 #include "macro.hpp"

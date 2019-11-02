@@ -9,7 +9,7 @@
 #include <exception>
 #include <iostream>
 
-namespace Log {
+namespace Debug {
     class Exception : public std::exception {
     public:
         Exception() = default;
@@ -17,7 +17,7 @@ namespace Log {
         Exception(const char *what, const char *where);
         ~Exception() override;
 
-        void debugErrorMessage();
+        void debugErrorMessage() const;
 
     private:
         std::string _what;

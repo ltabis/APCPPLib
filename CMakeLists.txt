@@ -1,25 +1,48 @@
 cmake_minimum_required(VERSION 3.14)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 project(APCPPLib)
 
-add_compile_options(-g)
-find_package(Threads)
+# Adding valgrind flags
+if (MSVC)
+    add_compile_options(/W4 /WX)
+else()
+    add_compile_options(-g)
+endif()
 
+set(CMAKE_CXX_FLAGS "-Wall -fprofile-arcs -ftest-coverage")
+
+## Enable Google test library
+enable_testing()
+
+# Required packages
+find_package(Threads)
+find_package(GTest REQUIRED)  
+
+set(SRC lib/src/Exception/Exception.cpp
+        lib/src/Log/Logger.cpp
+        lib/src/Benchmarking/Breakpoint.cpp)
+
+## Include headers to program
 include_directories(
   lib/src/Exception
   lib/src/Log
   lib/src/Benchmarking
   include)
 
+## Creating executable
 add_executable(APCPPLib
-  lib/src/Exception/Exception.cpp
-  lib/src/Log/Logger.cpp
-  lib/src/Benchmarking/Breakpoint.cpp
+  ${SRC}
   main.cpp)
 
-add_custom_target(unit_tests ALL
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/
-  COMMAND make
-)
+## Creating executable of unit tests
+include(GoogleTest)
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
+add_executable(unit_tests
+              ${SRC}
+              tests/Exception/test_exception.cpp)
 
+## Linking libraries
 target_link_libraries(APCPPLib ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(unit_tests PUBLIC
+                      ${GTEST_LIBRARIES} pthread
+                      ${CMAKE_THREAD_LIBS_INIT})

@@ -7,8 +7,10 @@
  */
 
 #include <iomanip>
+#include <sstream>
 #include <iostream>
 #include <chrono>
+#include <mutex>
 
 #include "macro.hpp"
 
@@ -26,5 +28,6 @@ namespace Debug {
             char _flags;
             const char *_name;
             const char *_where;
+            std::mutex _mutex;
     };
 }
