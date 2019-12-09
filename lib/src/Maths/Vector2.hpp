@@ -4,9 +4,6 @@
 
 #pragma once
 
-#include "macro.hpp"
-
-#include <exception>
 #include <iostream>
 
 namespace Maths {
@@ -31,7 +28,28 @@ namespace Maths {
         /// Destroy the Vector2 class
         ~Vector2() = default;
 
+        /// \brief X getter
+        /// \return the value of the x field.
+        T x() const;
+        /// \brief Y getter
+        /// \return the value of the y field.
+        T y() const;
+
+        /// \brief X setter
+        /// \param value : the new value of the x field.
+        void setX(T value);
+        /// \brief Y setter
+        /// \param value : the new value of the y field.
+        void setY(T value);
+
     private:
         T _x, _y;
     };
+}
+
+template<typename T>
+std::ostream &operator<<(std::ostream &os, const Maths::Vector2<T> &vector)
+{ 
+    os << "2D <" << vector.x() << ", " << vector.y() << ">"; 
+    return os; 
 }
