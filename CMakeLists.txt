@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 project(APCPPLib)
 
 # Adding valgrind flags
@@ -20,12 +20,14 @@ find_package(GTest REQUIRED)
 
 set(SRC lib/src/Exception/Exception.cpp
         lib/src/Log/Logger.cpp
-        lib/src/Benchmarking/Breakpoint.cpp)
+        lib/src/Benchmarking/Breakpoint.cpp
+        lib/src/Maths/Vector2.cpp)
 
 ## Include headers to program
 include_directories(
-  lib/src/Exception
   lib/src/Log
+  lib/src/Maths
+  lib/src/Exception
   lib/src/Benchmarking
   include)
 

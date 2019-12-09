@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <ratio>
 #include <queue>
 #include <mutex>
 #include <string>
@@ -15,9 +16,9 @@
 #include <thread>
 #include <chrono>
 #include <fstream>
-#include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <iostream>
 #include <condition_variable>
 
 #include "macro.hpp"

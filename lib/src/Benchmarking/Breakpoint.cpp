@@ -32,6 +32,6 @@ std::string Debug::Breakpoint::getCurrentTimeString(std::chrono::high_resolution
     auto tm = *std::localtime(&t);
 
     oss << std::put_time(&tm, "(%Hh %Mm %Ss");
-    oss << " " << std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(end.time_since_epoch()).count()) << "µs";
+    oss << " " << std::to_string((std::chrono::duration_cast<std::chrono::milliseconds>(end.time_since_epoch()) % 1000).count()) << "ms";
     return BLUE + oss.str() + ") " + WHITE;
 }

@@ -12,11 +12,11 @@
  *   Construcor / Destructor.
  */
 
-Debug::Logger::Logger(char flags, mode mode) : _mode(mode), _flags(flags), _bNotified(false), _bIsWorkerActive(true)
+Debug::Logger::Logger(char flags, mode mode) : _mode(mode), _flags(flags), _bNotified(false), _bIsWorkerActive(true), _time(std::chrono::high_resolution_clock::now())
 {
     _worker = std::thread(&Logger::writeContent, this);
 }
-Debug::Logger::Logger(const std::string &filePath, char flags, mode mode) : _mode(mode), _flags(flags), _file(filePath), _bNotified(false), _bIsWorkerActive(true)
+Debug::Logger::Logger(const std::string &filePath, char flags, mode mode) : _mode(mode), _flags(flags), _file(filePath), _bNotified(false), _bIsWorkerActive(true), _time(std::chrono::high_resolution_clock::now())
 {
     _worker = std::thread(&Logger::writeContent, this);
 }
@@ -106,8 +106,7 @@ std::string Debug::Logger::getCurrentTimeString()
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
 
-    _time = std::chrono::high_resolution_clock::now();
     oss << (_mode == FILE ? std::put_time(&tm, "(%d-%m-%Y %Hh %Mm %Ss") : std::put_time(&tm, "(%Hh %Mm %Ss"));
-    oss << " " << std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(_time.time_since_epoch()).count()) << "µs";
+    oss << " " << std::to_string((std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()) % 1000).count()) << "ms";
     return _mode == FILE ? oss.str() + ") " : BLUE + oss.str() + ") " + WHITE;
 }
