@@ -21,7 +21,8 @@ find_package(GTest REQUIRED)
 set(SRC lib/src/Exception/Exception.cpp
         lib/src/Log/Logger.cpp
         lib/src/Benchmarking/Breakpoint.cpp
-        lib/src/Maths/Vector2.cpp)
+        lib/src/Maths/Vector2.cpp
+        lib/src/Maths/Vector3.cpp)
 
 ## Include headers to program
 include_directories(
