@@ -6,8 +6,13 @@
 
 #include <iostream>
 
+
+/// \namespace Maths
+/// \brief math namespace
 namespace Maths {
 
+    /// \class Vector2
+    /// \brief Vector class that stores two coordinates
     template<typename T>
     struct Vector2 {
         /// \brief Ctor
