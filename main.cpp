@@ -1,15 +1,11 @@
 #include <iostream>
-#include "Logger.hpp"
-#include "Breakpoint.hpp"
-#include "Vector2.hpp"
-#include "Vector3.hpp"
+#include "Triangles.hpp"
+#include "Tuples.hpp"
 
 int main()
 {
-	Maths::Vector2<float> vector2(9.5f, 105.2f);
-	Maths::Vector3<int> vector3(9, 105, 10);
+	std::tuple<float, float, float> tup(14, 105, 106);
 
-	std::cout << vector2 << std::endl;
-	std::cout << vector3 << std::endl;
+	std::cout << Utils::max_tuple_value(tup) << std::endl;
 	return 0;
 }
