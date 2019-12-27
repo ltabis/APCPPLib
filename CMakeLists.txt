@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 set(CMAKE_CXX_STANDARD 17)
-project(APCPPLib)
+project(APCPPLib VERSION 1.0 DESCRIPTION "A library designed to help you during the developpement of your C++ projects")
 
 # Adding valgrind flags
 if (MSVC)
@@ -11,19 +11,20 @@ endif()
 
 set(CMAKE_CXX_FLAGS "-Wall -fprofile-arcs -ftest-coverage")
 
-## Enable Google test library
+# Enable Google test library
 enable_testing()
 
 # Required packages
 find_package(Threads)
 find_package(GTest REQUIRED)  
 
+# source files
 set(SRC lib/src/Exception/Exception.cpp
         lib/src/Log/Logger.cpp
         lib/src/Benchmarking/Breakpoint.cpp
         lib/src/Maths/Triangles.cpp)
 
-## Include headers to program
+# Include headers to program
 include_directories(
   lib/src/Log
   lib/src/Maths
@@ -32,24 +33,25 @@ include_directories(
   lib/src/Benchmarking
   include)
 
-## Creating executable
-add_executable(APCPPLib
-  ${SRC}
-  main.cpp)
+# Creating the library
+add_library(APCPPLib SHARED ${SRC})
 
-## Creating executable of unit tests
+# Set library version
+set_target_properties(APCPPLib PROPERTIES VERSION ${PROJECT_VERSION})
+
+# Creating executable of unit tests
 include(GoogleTest)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
 add_executable(unit_tests
-              ${SRC}
               tests/main.cpp
               tests/Exception/test_exception.cpp
               tests/Maths/test_triangles.cpp
               tests/Utils/test_tuples.cpp
 	            tests/Log/test_logger.cpp)
 
-  ## Linking libraries
+## Linking libraries
 target_link_libraries(APCPPLib ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(unit_tests PUBLIC
+                      APCPPLib
                       ${GTEST_LIBRARIES} pthread
                       ${CMAKE_THREAD_LIBS_INIT})
