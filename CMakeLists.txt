@@ -44,7 +44,7 @@ add_executable(unit_tests
               ${SRC}
               tests/main.cpp
               tests/Exception/test_exception.cpp
-              tests/Maths/test_formula.cpp
+              tests/Maths/test_triangles.cpp
               tests/Utils/test_tuples.cpp
 	            tests/Log/test_logger.cpp)
 
