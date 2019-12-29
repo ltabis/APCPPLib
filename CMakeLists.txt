@@ -34,7 +34,7 @@ include_directories(
   include)
 
 # Creating the library
-add_library(APCPPLib SHARED ${SRC})
+add_library(APCPPLib STATIC ${SRC})
 
 # Set library version
 set_target_properties(APCPPLib PROPERTIES VERSION ${PROJECT_VERSION})
