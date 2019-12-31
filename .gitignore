@@ -1,3 +1,4 @@
+
 # Prerequisites
 *.d
 
@@ -52,3 +53,4 @@ cmake-build-debug/
 # Other
 unit_tests
 apcpplib.conf
+test.sh
