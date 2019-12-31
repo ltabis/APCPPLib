@@ -36,16 +36,12 @@ void Debug::Logger::setFlags(char flags)
     _flags = flags;
 }
 
-void Debug::Logger::switchMode(mode mode, const std::string &filePath)
+void Debug::Logger::switchMode(mode mode)
 {
     _mode = mode;
-    if (mode == FILE) {
-        if (_file.is_open())
-            _file.close();
-        _file.open(filePath.empty() ? DEFAULT_LOG_FILE : filePath, std::ofstream::out | std::ofstream::app);
-    } else
-        if (_file.is_open())
-            _file.close();
+
+    if (mode != FILE && _file.is_open())
+        _file.close();
 }
 
 void Debug::Logger::writeContent()
@@ -86,6 +82,14 @@ void Debug::Logger::generateDebugMessage(const std::string &formated)
     else if (_mode == FILE && _file.is_open())
         _file << formated << std::endl;
 }
+
+void Debug::Logger::setFileOutput(const std::string &filepath)
+{
+    if (_file.is_open())
+        _file.close();
+    _file.open(filepath, std::ofstream::out | std::ofstream::app);
+}
+
 
 void Debug::Logger::generateMessageInFile(type type, const std::string &message, const std::string &where)
 {

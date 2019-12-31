@@ -34,25 +34,22 @@ namespace Debug {
             Logger(const Logger&) = delete;
             Logger& operator=(const Logger&) = delete;
 
-            // Singleton instance and dtor.
+            // Dtor.
             ~Logger();
+        
+            // Singleton instance
             static Logger *getInstance(mode mode = STANDARD, char flags = Flags::all_on)
             {
                 static std::unique_ptr<Logger> loggerObject(new Logger(flags, mode));
 
                 return loggerObject.get();
             }
-            static Logger *getInstance(const std::string &filePath, char flags = Flags::all_on)
-            {
-                static std::unique_ptr<Logger> loggerObject(new Logger(filePath, flags, FILE));
-
-                return loggerObject.get();
-            }
 
             void setFlags(char flags);
-            void switchMode(mode mode, const std::string &filePath = std::string());
+            void switchMode(mode mode);
             void generateDebugMessage(type type, const std::string &message, const std::string &where = "unknown");
             void generateDebugMessage(const std::string &formated);
+            void setFileOutput(const std::string &filepath);
 
         private:
             Logger(const std::string &filepath, char flags = Flags::all_on, mode mode = FILE);

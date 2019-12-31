@@ -22,10 +22,11 @@ TEST(LoggerTests, debugMessageOnStdout)
 
 TEST(LoggerTests, debugMessageInFile)
 {
-    Debug::Logger *log = Debug::Logger::getInstance("output.txt");
+    Debug::Logger *log = Debug::Logger::getInstance();
     std::string output;
 
-    log->switchMode(Debug::FILE, "output.txt");
+    log->setFileOutput("output.txt");
+    log->switchMode(Debug::FILE);
     log->generateDebugMessage(Debug::INFO, "Info message", "test::debugMessageInFile");
 
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -43,12 +44,14 @@ TEST(LoggerTests, debugMessageInFile)
 
 TEST(LoggerTests, switchModeTest)
 {
-    Debug::Logger *log = Debug::Logger::getInstance("output.txt");
+    Debug::Logger *log = Debug::Logger::getInstance();
     std::string output;
     testing::internal::CaptureStdout();
 
+    log->setFileOutput("output.txt");
     log->switchMode(Debug::STANDARD);
     log->generateDebugMessage(Debug::INFO, "Info message", "test::switchModeTest");
+
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
     output = testing::internal::GetCapturedStdout();
     std::size_t pos = output.find(")");
