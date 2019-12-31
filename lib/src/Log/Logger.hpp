@@ -23,12 +23,14 @@
 
 #include "macro.hpp"
 
-namespace Debug {
+namespace Debug
+{
 
     typedef enum e_mode {STANDARD, FILE, OFF} mode;
     typedef enum e_type {DEBUG = 2, INFO = 4, WARNING = 8, ERROR = 16, FATAL = 32} type;
 
-    class Logger {
+    class Logger
+    {
         public:
             // Illegal methods
             Logger(const Logger&) = delete;
@@ -43,6 +45,13 @@ namespace Debug {
                 static std::unique_ptr<Logger> loggerObject(new Logger(flags, mode));
 
                 return loggerObject.get();
+            }
+
+            static void generateDebugMessageStatic(type type, const std::string &message, const std::string &where = "unknown")
+            {
+                Logger *instance = getInstance();
+
+                instance->generateDebugMessage(type, message, where);
             }
 
             void setFlags(char flags);
