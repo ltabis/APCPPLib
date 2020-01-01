@@ -39,6 +39,57 @@ namespace Debug
             // Dtor.
             ~Logger();
         
+            static void printDebug(type type, const std::string &message, const std::string &where = "unknown")
+            {
+                Logger *instance = getInstance();
+
+                if (instance->_mode == STANDARD && !(instance->_flags & type))
+                        instance->generateMessageOnStandardOutput(type, message, where);
+                    else if (instance->_mode == FILE && !(instance->_flags & type))
+                        instance->generateMessageInFile(type, message, where);
+                    instance->_condVar.notify_one();
+                    instance->_bNotified = true;
+            }
+
+            static void printDebug(const std::string &formated)
+            {
+                Logger *instance = getInstance();
+
+                if (instance->_mode == STANDARD)
+                    std::cout << formated << std::endl;
+                else if (instance->_mode == FILE && instance->_file.is_open())
+                    instance->_file << formated << std::endl;
+
+            }
+
+            static void setFlags(char flags)
+            {
+                Logger *instance = getInstance();
+
+                instance->_flags = flags;
+            }
+
+            static void switchMode(mode mode)
+            {
+                Logger *instance = getInstance();
+
+                instance->_mode = mode;
+
+                if (mode != FILE && instance->_file.is_open())
+                    instance->_file.close();
+            }
+
+            static void setFileOutput(const std::string &filepath)
+            {
+                Logger *instance = getInstance();
+
+                if (instance->_file.is_open())
+                    instance->_file.close();
+                instance->_file.open(filepath, std::ofstream::out | std::ofstream::app);
+            }
+
+        private:
+            
             // Singleton instance
             static Logger *getInstance(mode mode = STANDARD, char flags = Flags::all_on)
             {
@@ -47,20 +98,6 @@ namespace Debug
                 return loggerObject.get();
             }
 
-            static void generateDebugMessageStatic(type type, const std::string &message, const std::string &where = "unknown")
-            {
-                Logger *instance = getInstance();
-
-                instance->generateDebugMessage(type, message, where);
-            }
-
-            void setFlags(char flags);
-            void switchMode(mode mode);
-            void generateDebugMessage(type type, const std::string &message, const std::string &where = "unknown");
-            void generateDebugMessage(const std::string &formated);
-            void setFileOutput(const std::string &filepath);
-
-        private:
             Logger(const std::string &filepath, char flags = Flags::all_on, mode mode = FILE);
             Logger(char flags = Flags::all_on, mode mode = STANDARD);
 

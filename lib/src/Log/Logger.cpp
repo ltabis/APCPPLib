@@ -8,10 +8,6 @@
 
 #include "Logger.hpp"
 
-/*
- *   Construcor / Destructor.
- */
-
 Debug::Logger::Logger(char flags, mode mode) : _mode(mode), _flags(flags), _bNotified(false), _bIsWorkerActive(true), _time(std::chrono::high_resolution_clock::now())
 {
     _worker = std::thread(&Logger::writeContent, this);
@@ -31,19 +27,6 @@ Debug::Logger::~Logger()
     _worker.join();
 }
 
-void Debug::Logger::setFlags(char flags)
-{
-    _flags = flags;
-}
-
-void Debug::Logger::switchMode(mode mode)
-{
-    _mode = mode;
-
-    if (mode != FILE && _file.is_open())
-        _file.close();
-}
-
 void Debug::Logger::writeContent()
 {
     std::unique_lock<std::mutex> lock(_notifiedMutex);
@@ -52,44 +35,12 @@ void Debug::Logger::writeContent()
         while (!_bNotified)
             _condVar.wait(lock);
         while (!_queue.empty() && _mode != OFF) {
-            generateDebugMessage(_queue.front());
+            printDebug(_queue.front());
             _queue.pop();
         }
     _bNotified = false;
     }
 }
-
-//// USER ACCESS
-
-/*
- *   generate a debug message with a type and where parameters.
- */
-
-void Debug::Logger::generateDebugMessage(type type, const std::string &message, const std::string &where)
-{
-    if (_mode == STANDARD && !(_flags & type))
-        generateMessageOnStandardOutput(type, message, where);
-    else if (_mode == FILE && !(_flags & type))
-        generateMessageInFile(type, message, where);
-    _condVar.notify_one();
-    _bNotified = true;
-}
-
-void Debug::Logger::generateDebugMessage(const std::string &formated)
-{
-    if (_mode == STANDARD)
-        std::cout << formated << std::endl;
-    else if (_mode == FILE && _file.is_open())
-        _file << formated << std::endl;
-}
-
-void Debug::Logger::setFileOutput(const std::string &filepath)
-{
-    if (_file.is_open())
-        _file.close();
-    _file.open(filepath, std::ofstream::out | std::ofstream::app);
-}
-
 
 void Debug::Logger::generateMessageInFile(type type, const std::string &message, const std::string &where)
 {
