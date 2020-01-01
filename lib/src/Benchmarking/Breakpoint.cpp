@@ -20,7 +20,7 @@ void Debug::Breakpoint::displayTimePassed()
     std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 
     if (!(_flags & Flags::debug_off))
-        std::cout << getCurrentTimeString(end) << BREAKPOINT_MESSAGE <<
+        std::cout << getCurrentTimeString(end) << "Breakpoint [" << REDUNDERLINED << "*" << WHITE << "]" <<
                      " Operation " << CYAN << _name << WHITE << " in " << MAGENTA << _where << WHITE <<
                      " lasted for " << std::chrono::duration_cast<std::chrono::microseconds>(end - _start).count() << " µs" << std::endl;
 }
