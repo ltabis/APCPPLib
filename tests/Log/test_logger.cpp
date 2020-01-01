@@ -7,11 +7,10 @@
 
 TEST(LoggerTests, debugMessageOnStdout)
 {
-    Debug::Logger *log = Debug::Logger::getInstance(Debug::STANDARD, Debug::Flags::fatal_off);
     testing::internal::CaptureStdout();
     std::string output;
 
-    log->generateDebugMessage(Debug::DEBUG, "debug message", "test::debugMessageOnStdout");
+    Debug::Logger::printDebug(Debug::DEBUG, "debug message", "test::debugMessageOnStdout");
 
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
     output = testing::internal::GetCapturedStdout();
@@ -22,14 +21,14 @@ TEST(LoggerTests, debugMessageOnStdout)
 
 TEST(LoggerTests, debugMessageInFile)
 {
-    Debug::Logger *log = Debug::Logger::getInstance();
     std::string output;
 
-    log->setFileOutput("output.txt");
-    log->switchMode(Debug::FILE);
-    log->generateDebugMessage(Debug::INFO, "Info message", "test::debugMessageInFile");
+    Debug::Logger::setFileOutput("output.txt");
+    Debug::Logger::switchMode(Debug::FILE);
+    Debug::Logger::printDebug(Debug::INFO, "Info message", "test::debugMessageInFile");
 
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
+
     std::fstream stream("output.txt", std::fstream::in);
     if (!stream.is_open() || !getline(stream, output)) {
         ASSERT_NO_FATAL_FAILURE("File could not open");
@@ -44,15 +43,15 @@ TEST(LoggerTests, debugMessageInFile)
 
 TEST(LoggerTests, switchModeTest)
 {
-    Debug::Logger *log = Debug::Logger::getInstance();
     std::string output;
     testing::internal::CaptureStdout();
 
-    log->setFileOutput("output.txt");
-    log->switchMode(Debug::STANDARD);
-    log->generateDebugMessage(Debug::INFO, "Info message", "test::switchModeTest");
+    Debug::Logger::setFileOutput("output.txt");
+    Debug::Logger::switchMode(Debug::STANDARD);
+    Debug::Logger::printDebug(Debug::INFO, "Info message", "test::switchModeTest");
 
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
+
     output = testing::internal::GetCapturedStdout();
     std::size_t pos = output.find(")");
     std::string str = output.substr(pos + 2);
@@ -61,12 +60,13 @@ TEST(LoggerTests, switchModeTest)
 
 TEST(LoggerTests, switchModeTestInverse)
 {
-    Debug::Logger *log = Debug::Logger::getInstance();
     std::string output;
 
-    log->switchMode(Debug::FILE);
-    log->generateDebugMessage(Debug::INFO, "Info message", "test::switchModeTestInverse");
+    Debug::Logger::switchMode(Debug::FILE);
+    Debug::Logger::printDebug(Debug::INFO, "Info message", "test::switchModeTestInverse");
+
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
+
     std::fstream stream("output.txt", std::fstream::in);
     if (!stream.is_open() || !getline(stream, output)) {
         ASSERT_NO_FATAL_FAILURE("File could not open");
@@ -81,27 +81,30 @@ TEST(LoggerTests, switchModeTestInverse)
 
 TEST(LoggerTests, setFlags)
 {
-    Debug::Logger *log = Debug::Logger::getInstance();
     std::string output;
     testing::internal::CaptureStdout();
 
-    log->setFlags(Debug::Flags::info_off);
-    log->generateDebugMessage(Debug::INFO, "Info message", "test::switchModeTest");
+    Debug::Logger::setFlags(Debug::Flags::info_off);
+    Debug::Logger::printDebug(Debug::INFO, "Info message", "test::switchModeTest");
+    
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    
     output = testing::internal::GetCapturedStdout();
     ASSERT_STREQ("", output.c_str());
 }
 
 TEST(LoggerTests, logOff)
 {
-    Debug::Logger *log = Debug::Logger::getInstance(Debug::OFF);
     std::string output;
     testing::internal::CaptureStdout();
 
-    log->generateDebugMessage(Debug::INFO, "Info message", "test::switchModeTest");
-    log->generateDebugMessage(Debug::INFO, "Info message", "test::switchModeTest");
-    log->generateDebugMessage(Debug::INFO, "Info message", "test::switchModeTest");
+    Debug::Logger::setFlags(Debug::OFF);
+    Debug::Logger::printDebug(Debug::INFO, "Info message", "test::switchModeTest");
+    Debug::Logger::printDebug(Debug::ERROR, "Error message", "test::switchModeTest");
+    Debug::Logger::printDebug(Debug::DEBUG, "Debug message", "test::switchModeTest");
+
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
+
     output = testing::internal::GetCapturedStdout();
     ASSERT_STREQ("", output.c_str());
 }
