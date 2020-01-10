@@ -6,7 +6,7 @@ project(APCPPLib VERSION 1.0 DESCRIPTION "A library designed to help you during 
 if (MSVC)
     add_compile_options(/W4 /WX)
 else()
-    add_compile_options(-g)
+    add_compile_options(-g -ldl)
 endif()
 
 set(CMAKE_CXX_FLAGS "-Wall -fprofile-arcs -ftest-coverage")
