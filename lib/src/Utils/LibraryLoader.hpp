@@ -12,16 +12,18 @@
 #include <vector>
 #include <string>
 
-namespace Utils {
+namespace Utils
+{
 
     /// \class LibraryLoader
     /// \brief an object that loads dynamic libraries.
-    class LibraryLoader {
+    class LibraryLoader
+    {
     public:
 
         /// \brief opens a library via a filepath.
         /// \param lib : path of the library to open.
-        /// \return a pointer to the new allocate entrypoint object
+        /// \return a pointer to the new allocated object.
         template<typename T>
         T *openLibrary(const std::string &lib)
         {
@@ -30,44 +32,67 @@ namespace Utils {
             void *handle = dlopen(cat.c_str(), RTLD_LAZY);
             char *error = nullptr;
 
-            if (!handle) {
+            // Failed to open the dynamic library.
+            if (!handle)
+            {
                 std::cout << dlerror() << std::endl;
                 return nullptr;
             }
+
+            // Getting the entry point.
             auto func = (T *(*)())dlsym(handle, "entryPoint");
-            if ((error = dlerror())) {
+
+            // Found error.
+            if ((error = dlerror()))
+            {
                 std::cout << "error : " << error << std::endl;
                 return nullptr;
             }
+
+            // Creating the desired object via the entry point.
             obj = func();
+
+            // Saving the handle.
             _handles.push_back(handle);
+            
             return obj;
         }
 
-        /// \brief opens a library via a filepath.
-        /// \param directory : directory .
-        /// \return a pointer to the new allocate entrypoint object
+        /// \brief opens all libraries from a directory.
+        /// \param directory : directory path to open.
+        /// \return a vector of pointers to the new allocated object.
         template<typename T>
         std::vector<T *> openDirectory(const std::string &directory)
         {
+            std::vector<T *> objects;
             DIR *dir = opendir(directory.c_str());
-            struct dirent *stream = nullptr;
-            std::vector<T *> v;
 
+            // Failed to open directory.
             if (!dir)
-                return v;
+                return objects;
+
+            struct dirent *stream = nullptr;
+
+            // Reading files
             stream = readdir(dir);
-            for (std::string str; stream; stream = readdir(dir)) {
+            for (std::string str; stream; stream = readdir(dir))
+            {
                 str = stream->d_name;
-                if (str.length() >= 3 && stream->d_type == DT_REG &&
-                str.find_last_of(".so", std::string::npos) != std::string::npos) {
-                auto newElement = openLibrary<T>(directory + "/" + str);
-                if (newElement)
-                    v.push_back(newElement);
+
+                // Checking if the name of the file is correct.
+                if (stream->d_type == DT_REG && str.find_last_of(".so", std::string::npos) != std::string::npos)
+                {
+                    auto newElement = openLibrary<T>(directory + "/" + str);
+
+                    // If the element as been loaded correctly, adding it to the new vector of objects.
+                    if (newElement)
+                        objects.push_back(newElement);
                 }
             }
+
+            // Closing stream.
             closedir(dir);
-            return v;
+            return objects;
         }
 
     private:
