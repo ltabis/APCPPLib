@@ -32,6 +32,7 @@ namespace Maths {
         ~Vector3() = default;
 
         T x, y, z;
+    };
 
     /// \class Vector2
     /// \brief Vector class that stores two coordinates
