@@ -43,7 +43,8 @@ std::string Game::SceneStateMachine::name() const
 
 bool Game::SceneStateMachine::update()
 {
-    return _scenes.top()->update();
+    _scenes.top()->update();
+    return true;
 }
 
 void Game::SceneStateMachine::clear()
