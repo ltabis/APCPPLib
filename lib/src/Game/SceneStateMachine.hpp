@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <unordered_map>
+#include <functional>
 #include <memory>
 #include <string>
 #include <stack>
@@ -18,26 +20,28 @@ namespace Game
     /// @enum scene_behavior
     enum scene_state
     {
-        POP = 1,
-        SWAP = 2,
-        INCATIVE = 4
+        POP,
+        SWAP
     };
 
     class IMediator
     {
     public:
 
-        virtual void notify(const std::string &sender, std::size_t state) = 0;
+        virtual void notify(const std::string &sender, scene_state state, IScene *new_scene) = 0;
     };
 
     class SceneStateMachine : public IMediator
     {
     public:
 
-        // Dtor
+        // Ctor / Dtor
+        SceneStateMachine();
+
         ~SceneStateMachine();
 
-        void notify(const std::string &sender, std::size_t state) override;
+        // Interface
+        void notify(const std::string &sender, scene_state state, IScene *new_scene) override;
 
         // Running
         bool update();
@@ -55,7 +59,7 @@ namespace Game
         
         void remove();
 
-        // getters
+        // Getters
         std::size_t size() const;
 
         std::string name() const;
@@ -63,7 +67,14 @@ namespace Game
         bool empty() const;
         
     private:
+
+        void popCallback(IScene *scene);
+
+        void swapCallback(IScene *scene);
+
         /*! the stack of scenes */
         std::stack<std::shared_ptr<Game::IScene>> _scenes;
+
+        std::unordered_map<scene_state, std::function<void(SceneStateMachine &, IScene *)>> _callbacks;
    };
 }

@@ -4,16 +4,24 @@
 
 #include "SceneStateMachine.hpp"
 
+Game::SceneStateMachine::SceneStateMachine()
+{
+    _callbacks.emplace(POP, &SceneStateMachine::popCallback);
+    _callbacks.emplace(SWAP, &SceneStateMachine::swapCallback);
+}
+
 Game::SceneStateMachine::~SceneStateMachine()
 {
     clear();
 }
 
-void Game::SceneStateMachine::notify(const std::string &sender, std::size_t state)
+void Game::SceneStateMachine::notify(const std::string &sender, Game::scene_state state, Game::IScene *new_scene)
 {
-    (void) sender;
-    (void) state;
-    // (void) IScene *newScene;
+    // That should not happen.
+    if (sender != _scenes.top()->name())
+        return;
+
+    _callbacks[state](*this, new_scene);
 }
 
 bool Game::SceneStateMachine::update()
@@ -75,4 +83,21 @@ std::string Game::SceneStateMachine::name() const
 bool Game::SceneStateMachine::empty() const
 {
     return _scenes.empty();
+}
+
+void Game::SceneStateMachine::popCallback(IScene *scene)
+{
+    (void) scene;
+
+    pop();
+}
+
+void Game::SceneStateMachine::swapCallback(IScene *scene)
+{
+    if (!scene)
+        return;
+
+    // Tra,sforming pointer into a shared one.
+    std::shared_ptr<IScene> ptr(scene);
+    swap(ptr);
 }
