@@ -34,6 +34,9 @@ namespace Game
     {
     public:
 
+        // Dtor
+        ~SceneStateMachine();
+
         void notify(const std::string &sender, std::size_t state) override;
 
         // Running

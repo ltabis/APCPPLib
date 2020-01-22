@@ -4,10 +4,16 @@
 
 #include "SceneStateMachine.hpp"
 
+Game::SceneStateMachine::~SceneStateMachine()
+{
+    clear();
+}
+
 void Game::SceneStateMachine::notify(const std::string &sender, std::size_t state)
 {
     (void) sender;
     (void) state;
+    // (void) IScene *newScene;
 }
 
 bool Game::SceneStateMachine::update()
@@ -15,7 +21,7 @@ bool Game::SceneStateMachine::update()
     if (!empty())
     {
         _scenes.top()->update();
-        return false;
+        return true;
     }
     return false;
 }
