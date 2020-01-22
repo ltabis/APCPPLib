@@ -27,46 +27,40 @@ namespace Game
     {
     public:
 
-        void notify(const std::string &sender, std::size_t state);
+        virtual void notify(const std::string &sender, std::size_t state) = 0;
     };
 
     class SceneStateMachine : public IMediator
     {
     public:
-        
-        inline void push(std::shared_ptr<Game::IScene> &&scene);
-        
-        /// \brief Destroy the scene on top of the stack
-        inline void pop();
-        
-        /// \param name : Last scene to destroy
-        /// \brief Destroy all scenes unit the current scene corespond to the name parameter
-        inline void pop(const std::string &name);
-        
-        /// \param scene : The scene to replace
-        /// \brief Swap the current scene with the scene passed as parameter
-        inline void swap(std::shared_ptr<Game::IScene> &&scene);
-        
-        /// \return the size of the stack
-        /// \brief get the size of the stack
-        inline std::size_t size() const;
 
-        inline bool empty() const;
+        void notify(const std::string &sender, std::size_t state) override;
 
-        /// \return the name of the current scene
-        /// \brief get the name of the current scene
-        inline std::string name() const;
-        
-        inline bool update();
-        
-        /// \brief clear all scenes in the stack
-        inline void clear();
-        
-        /// \brief remove elements of top scene
-        inline void remove();
+        // Running
+        bool update();
 
-        private:
-            /*! the stack of scenes */
-            std::stack<std::shared_ptr<Game::IScene>> _scenes;
+        // Memory modification        
+        void push(std::shared_ptr<Game::IScene> &scene);
+        
+        void swap(std::shared_ptr<Game::IScene> &scene);
+
+        void pop(const std::string &name);
+
+        void pop();        
+                
+        void clear();
+        
+        void remove();
+
+        // getters
+        std::size_t size() const;
+
+        std::string name() const;
+
+        bool empty() const;
+        
+    private:
+        /*! the stack of scenes */
+        std::stack<std::shared_ptr<Game::IScene>> _scenes;
    };
 }
