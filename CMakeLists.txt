@@ -23,11 +23,15 @@ set(SRC lib/src/Exception/Exception.cpp
         lib/src/Log/Logger.cpp
         lib/src/Benchmarking/Breakpoint.cpp
         lib/src/Maths/Triangles.cpp
-        lib/src/Utils/LibraryLoader.cpp)
+        lib/src/Utils/LibraryLoader.cpp
+        lib/src/Game/SceneStateMachine.cpp
+        lib/src/Game/AScene.cpp
+        )
 
 # Include headers to program
 include_directories(
   lib/src/Log
+  lib/src/Game
   lib/src/Maths
   lib/src/Utils
   lib/src/Exception
