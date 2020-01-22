@@ -147,7 +147,7 @@ public:
 		{
 			Debug::Logger::printDebug(Debug::INFO, "The Notify is being updated, poping the scene.", "Notify::update()");
 
-			// calling the mediator.
+			// calling the mediator for the sake of the example.
 			_mediator->notify(Game::POP, nullptr);
 		}
 
@@ -160,6 +160,10 @@ public:
 	void remove() override
 		{
 			Debug::Logger::printDebug(Debug::INFO, "Removing all objects.", "Notify::remove()");
+
+			// Swaping, for the sake of the example.
+			_mediator->notify(Game::SWAP, nullptr);
+			_mediator->notify(Game::SWAP, new SampleScene("SampleScene", _mediator));
 		}
 
 	void onCreate() override
@@ -190,4 +194,15 @@ TEST(SceneStateMachineTests, SceneStateMachine_notify)
 
 	// The scene should have notified the mediator to pop it.
     ASSERT_EQ(machine->size(), 0);
+
+    // Re-adding a scene to the machine.
+	machine->push(scene);
+    ASSERT_EQ(machine->size(), 1);
+
+	// Calling the remove method of the Notify class, where we asked it to swap.
+	machine->remove();
+
+	// The scene as been swaped with the SampleScene object.
+    ASSERT_EQ(machine->size(), 1);
+    ASSERT_EQ(machine->name(), "SampleScene");
 }
