@@ -28,7 +28,7 @@ namespace Game
     {
     public:
 
-        virtual void notify(const std::string &sender, scene_state state, IScene *new_scene) = 0;
+        virtual void notify(scene_state state, IScene *new_scene) = 0;
     };
 
     class SceneStateMachine : public IMediator
@@ -41,7 +41,7 @@ namespace Game
         ~SceneStateMachine();
 
         // Interface
-        void notify(const std::string &sender, scene_state state, IScene *new_scene) override;
+        void notify(scene_state state, IScene *new_scene) override;
 
         // Running
         bool update();

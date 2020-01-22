@@ -15,12 +15,8 @@ Game::SceneStateMachine::~SceneStateMachine()
     clear();
 }
 
-void Game::SceneStateMachine::notify(const std::string &sender, Game::scene_state state, Game::IScene *new_scene)
+void Game::SceneStateMachine::notify(Game::scene_state state, Game::IScene *new_scene)
 {
-    // That should not happen.
-    if (sender != _scenes.top()->name())
-        return;
-
     _callbacks[state](*this, new_scene);
 }
 

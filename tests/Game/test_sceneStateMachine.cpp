@@ -148,7 +148,7 @@ public:
 			Debug::Logger::printDebug(Debug::INFO, "The Notify is being updated, poping the scene.", "Notify::update()");
 
 			// calling the mediator.
-			_mediator->notify(_name, Game::POP, nullptr);
+			_mediator->notify(Game::POP, nullptr);
 		}
 
 
