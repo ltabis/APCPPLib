@@ -41,7 +41,7 @@ TEST(SceneStateMachineTests, SceneStateMachine_basic_methods)
 	std::shared_ptr<Game::SceneStateMachine> machine = std::make_shared<Game::SceneStateMachine>(Game::SceneStateMachine());
 	std::shared_ptr<Game::IMediator> ptr(machine);
 
-    // The interface is used to notify the scene manager that a machine stoped running.
+    // The interface is used to notify the scene manager that a scene stoped running.
 	std::shared_ptr<Game::IScene> scene(new SampleScene("SampleScene", ptr));
 
     // No scenes to update, return false.
@@ -67,7 +67,7 @@ TEST(SceneStateMachineTests, SceneStateMachine_scene_manipulation)
 	std::shared_ptr<Game::SceneStateMachine> machine = std::make_shared<Game::SceneStateMachine>(Game::SceneStateMachine());
 	std::shared_ptr<Game::IMediator> ptr(machine);
 
-    // The interface is used to notify the scene manager that a machine stoped running.
+    // The interface is used to notify the scene manager that a scene stoped running.
 	std::shared_ptr<Game::IScene> scene1(new SampleScene("SampleScene1", ptr));
 	std::shared_ptr<Game::IScene> scene2(new SampleScene("SampleScene2", ptr));
 
@@ -103,7 +103,7 @@ TEST(SceneStateMachineTests, SceneStateMachine_advanced_scene_manipulation)
 	std::shared_ptr<Game::SceneStateMachine> machine = std::make_shared<Game::SceneStateMachine>(Game::SceneStateMachine());
 	std::shared_ptr<Game::IMediator> ptr(machine);
 
-    // The interface is used to notify the scene manager that a machine stoped running.
+    // The interface is used to notify the scene manager that a scene stoped running.
 	std::shared_ptr<Game::IScene> scene1(new SampleScene("SampleScene1", ptr));
 	std::shared_ptr<Game::IScene> scene2(new SampleScene("SampleScene2", ptr));
 
@@ -135,5 +135,59 @@ TEST(SceneStateMachineTests, SceneStateMachine_advanced_scene_manipulation)
 	machine->pop("unknown");
 
 	// There isn't any scenes that are called "unknown" so everything as been poped.
+    ASSERT_EQ(machine->size(), 0);
+}
+
+class Notify : public Game::AScene
+{
+public:
+	Notify(const std::string &name, std::shared_ptr<Game::IMediator> mediator) : AScene(name, mediator) {}
+
+	void update() override
+		{
+			Debug::Logger::printDebug(Debug::INFO, "The Notify is being updated, poping the scene.", "Notify::update()");
+
+			// calling the mediator.
+			_mediator->notify(_name, Game::POP, nullptr);
+		}
+
+
+	void setVisible(bool visible) override
+		{
+			Debug::Logger::printDebug(Debug::INFO, "Making all object invisible.", "Notify::setVisible()");
+		}
+
+	void remove() override
+		{
+			Debug::Logger::printDebug(Debug::INFO, "Removing all objects.", "Notify::remove()");
+		}
+
+	void onCreate() override
+		{
+			Debug::Logger::printDebug(Debug::INFO, "onCreate method called.", "Notify::onCreate()");
+		}
+};
+
+
+TEST(SceneStateMachineTests, SceneStateMachine_notify)
+{
+    // Creating a new scene state machine, casting it into the IMediator interface.
+	std::shared_ptr<Game::SceneStateMachine> machine = std::make_shared<Game::SceneStateMachine>(Game::SceneStateMachine());
+	std::shared_ptr<Game::IMediator> ptr(machine);
+
+    // The interface is used to notify the scene manager that a scene stoped running.
+	std::shared_ptr<Game::IScene> scene(new Notify("Notify", ptr));
+
+    // No scenes to update, return false.
+	ASSERT_EQ(machine->update(), false);
+
+    // Adding a scene to the machine.
+	machine->push(scene);
+
+    // The manager has one scene in memory, updating it.
+    ASSERT_EQ(machine->size(), 1);
+	ASSERT_EQ(machine->update(), true);
+
+	// The scene should have notified the mediator to pop it.
     ASSERT_EQ(machine->size(), 0);
 }
