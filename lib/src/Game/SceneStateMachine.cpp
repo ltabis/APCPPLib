@@ -4,7 +4,7 @@
 
 #include "SceneStateMachine.hpp"
 
-Game::SceneStateMachine::SceneStateMachine()
+Game::SceneStateMachine::SceneStateMachine() : _deltaTime(std::chrono::high_resolution_clock::now().time_since_epoch().count())
 {
     _callbacks.emplace(POP, &SceneStateMachine::popCallback);
     _callbacks.emplace(SWAP, &SceneStateMachine::swapCallback);
@@ -22,9 +22,11 @@ void Game::SceneStateMachine::notify(Game::scene_state state, Game::IScene *new_
 
 bool Game::SceneStateMachine::update()
 {
+    _deltaTime = std::chrono::high_resolution_clock::now().time_since_epoch().count() - _deltaTime;
+
     if (!empty())
     {
-        _scenes.top()->update();
+        _scenes.top()->update(_deltaTime);
         return true;
     }
     return false;
@@ -64,6 +66,12 @@ void Game::SceneStateMachine::remove()
 {
     if (!empty())
         _scenes.top()->remove();
+}
+
+void Game::SceneStateMachine::setName(const std::string &name)
+{
+    if (!empty())
+        _scenes.top()->setName(name);
 }
 
 std::size_t Game::SceneStateMachine::size() const

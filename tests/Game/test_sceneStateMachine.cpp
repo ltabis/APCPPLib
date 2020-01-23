@@ -13,8 +13,9 @@ class SampleScene : public Game::AScene
 public:
 	SampleScene(const std::string &name, std::shared_ptr<Game::IMediator> mediator) : AScene(name, mediator) {}
 
-	void update() override
+	void update(float deltaTime) override
 		{
+			(void) deltaTime;
 			Debug::Logger::printDebug(Debug::INFO, "The SampleScene is being updated.", "SampleScene::update()");
 		}
 
@@ -32,6 +33,21 @@ public:
 	void onCreate() override
 		{
 			Debug::Logger::printDebug(Debug::INFO, "onCreate method called.", "SampleScene::onCreate()");
+		}
+
+	void onDestroy() override
+		{
+			Debug::Logger::printDebug(Debug::INFO, "onDestroy method called.", "SampleScene::onDestroy()");
+		}
+
+	void onActivate() override
+		{
+			Debug::Logger::printDebug(Debug::INFO, "onActivate method called.", "SampleScene::onActivate()");
+		}
+
+	void onDeactivate() override
+		{
+			Debug::Logger::printDebug(Debug::INFO, "onDeactivate method called.", "SampleScene::onDeactivate()");
 		}
 };
 
@@ -53,6 +69,10 @@ TEST(SceneStateMachineTests, SceneStateMachine_basic_methods)
     // The manager has one scene in memory, updating it.
     ASSERT_EQ(machine->size(), 1);
 	ASSERT_EQ(machine->update(), true);
+
+    // Changing the scene's name.
+	machine->setName("Scene name changed!");
+	ASSERT_EQ(machine->name(), "Scene name changed!");
 
     // Clearing the machine.
 	machine->clear();
@@ -143,8 +163,10 @@ class Notify : public Game::AScene
 public:
 	Notify(const std::string &name, std::shared_ptr<Game::IMediator> mediator) : AScene(name, mediator) {}
 
-	void update() override
+	void update(float deltaTime) override
 		{
+			(void) deltaTime;
+
 			Debug::Logger::printDebug(Debug::INFO, "The Notify is being updated, poping the scene.", "Notify::update()");
 
 			// calling the mediator for the sake of the example.
@@ -169,6 +191,21 @@ public:
 	void onCreate() override
 		{
 			Debug::Logger::printDebug(Debug::INFO, "onCreate method called.", "Notify::onCreate()");
+		}
+
+	void onDestroy() override
+		{
+			Debug::Logger::printDebug(Debug::INFO, "onDestroy method called.", "Notify::onDestroy()");
+		}
+
+	void onActivate() override
+		{
+			Debug::Logger::printDebug(Debug::INFO, "onActivate method called.", "Notify::onActivate()");
+		}
+
+	void onDeactivate() override
+		{
+			Debug::Logger::printDebug(Debug::INFO, "onDeactivate method called.", "Notify::onDeactivate()");
 		}
 };
 

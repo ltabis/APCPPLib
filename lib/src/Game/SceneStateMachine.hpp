@@ -13,6 +13,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <chrono>
 #include <stack>
 
 #include "IScene.hpp"
@@ -108,6 +109,12 @@ namespace Game
          */
         void remove();
 
+        /** 
+         * @brief Set the name of the scene on top of the stack.
+         * @param name : new name of the scene on top of the stack.
+         */
+        void setName(const std::string &name);
+
         // Getters
         /** 
          * @brief Get the size of the stack.
@@ -146,5 +153,8 @@ namespace Game
 
         /*! using callbacks via the states of the scenes */
         std::unordered_map<scene_state, std::function<void(SceneStateMachine &, IScene *)>> _callbacks;
+
+        /*! time since execution */
+        float _deltaTime;
    };
 }
