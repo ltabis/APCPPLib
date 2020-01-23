@@ -36,9 +36,5 @@ namespace Game
             virtual void setName(const std::string &name) = 0;
 
             virtual std::string name() const = 0;
-
-            virtual void setVisible(bool b) = 0;
-            
-            virtual void remove() = 0;
     };
 }

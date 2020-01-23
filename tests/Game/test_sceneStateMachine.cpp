@@ -19,17 +19,6 @@ public:
 			Debug::Logger::printDebug(Debug::INFO, "The SampleScene is being updated.", "SampleScene::update()");
 		}
 
-
-	void setVisible(bool visible) override
-		{
-			Debug::Logger::printDebug(Debug::INFO, "Making all object invisible.", "SampleScene::setVisible()");
-		}
-
-	void remove() override
-		{
-			Debug::Logger::printDebug(Debug::INFO, "Removing all objects.", "SampleScene::remove()");
-		}
-
 	void onCreate() override
 		{
 			Debug::Logger::printDebug(Debug::INFO, "onCreate method called.", "SampleScene::onCreate()");
@@ -145,9 +134,6 @@ TEST(SceneStateMachineTests, SceneStateMachine_advanced_scene_manipulation)
     ASSERT_EQ(machine->name(), "SampleScene2");
     ASSERT_EQ(machine->size(), 1);
 
-	// Removing elements from the current scene.
-	machine->remove();
-
 	// Push the first one again.
 	machine->push(scene1);
 
@@ -170,22 +156,7 @@ public:
 			Debug::Logger::printDebug(Debug::INFO, "The Notify is being updated, poping the scene.", "Notify::update()");
 
 			// calling the mediator for the sake of the example.
-			_mediator->notify(Game::POP, nullptr);
-		}
-
-
-	void setVisible(bool visible) override
-		{
-			Debug::Logger::printDebug(Debug::INFO, "Making all object invisible.", "Notify::setVisible()");
-		}
-
-	void remove() override
-		{
-			Debug::Logger::printDebug(Debug::INFO, "Removing all objects.", "Notify::remove()");
-
-			// Swaping, for the sake of the example.
-			_mediator->notify(Game::SWAP, nullptr);
-			_mediator->notify(Game::SWAP, new SampleScene("SampleScene", _mediator));
+			_mediator->notify(this, Game::POP, nullptr);
 		}
 
 	void onCreate() override
@@ -201,6 +172,10 @@ public:
 	void onActivate() override
 		{
 			Debug::Logger::printDebug(Debug::INFO, "onActivate method called.", "Notify::onActivate()");
+
+			// Swaping, for the sake of the example.
+			_mediator->notify(this, Game::SWAP, nullptr);
+			_mediator->notify(this, Game::SWAP, new SampleScene("SampleScene", _mediator));
 		}
 
 	void onDeactivate() override
@@ -236,10 +211,7 @@ TEST(SceneStateMachineTests, SceneStateMachine_notify)
 	machine->push(scene);
     ASSERT_EQ(machine->size(), 1);
 
-	// Calling the remove method of the Notify class, where we asked it to swap.
-	machine->remove();
-
 	// The scene as been swaped with the SampleScene object.
     ASSERT_EQ(machine->size(), 1);
-    ASSERT_EQ(machine->name(), "SampleScene");
+    ASSERT_EQ(machine->name(), "Notify");
 }

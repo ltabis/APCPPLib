@@ -8,6 +8,7 @@ Game::SceneStateMachine::SceneStateMachine() : _deltaTime(std::chrono::high_reso
 {
     _callbacks.emplace(POP, &SceneStateMachine::popCallback);
     _callbacks.emplace(SWAP, &SceneStateMachine::swapCallback);
+    _callbacks.emplace(PUSH, &SceneStateMachine::pushCallback);
 }
 
 Game::SceneStateMachine::~SceneStateMachine()
@@ -15,9 +16,9 @@ Game::SceneStateMachine::~SceneStateMachine()
     clear();
 }
 
-void Game::SceneStateMachine::notify(Game::scene_state state, Game::IScene *new_scene)
+void Game::SceneStateMachine::notify(Game::IScene *sender, Game::scene_state state, Game::IScene *new_scene)
 {
-    _callbacks[state](*this, new_scene);
+    _callbacks[state](*this, sender, new_scene);
 }
 
 bool Game::SceneStateMachine::update()
@@ -34,38 +35,60 @@ bool Game::SceneStateMachine::update()
 
 void Game::SceneStateMachine::push(std::shared_ptr<Game::IScene> &scene)
 {
+    // Deactivating the last scene before pushing a new one.
+    if (!empty())
+        _scenes.top()->onDeactivate();
+
+    // Pushing the new scene and call the onCreate() method.
     _scenes.push(scene);
+    _scenes.top()->onCreate();
 }
 
 void Game::SceneStateMachine::swap(std::shared_ptr<Game::IScene> &scene)
 {
+    // poping the current scene if the stack isn't empty.
     if (!empty())
         pop();
+
+    // Pushing the new scene and call the onCreate() method.
+    // We can't use the push() method because it could modify the scene before the one to be swaped.
     _scenes.push(scene);
+    _scenes.top()->onCreate();
 }
 
 void Game::SceneStateMachine::pop(const std::string &name)
 {
+    // Poping the scenes until the name is reached.
     while (!empty() && _scenes.top()->name() != name)
+    {
+        _scenes.top()->onDestroy();
         _scenes.pop();
+    }
+
+    // Activating the last scene if the stack isn't empty.
+    if (!empty())
+        _scenes.top()->onActivate();
 }
 
 void Game::SceneStateMachine::pop()
 {
     if (!empty())
+    {
+        // Destroying the scene and poping it.
+        _scenes.top()->onDestroy();
         _scenes.pop();
+
+        // If there is still a scene on the stack, activating it.
+        if (!empty())
+            _scenes.top()->onActivate();
+    }
 }
 
 void Game::SceneStateMachine::clear()
 {
+    // Poping all scenes unitil there is nothing left.
     while (!empty())
         pop();
-}
-
-void Game::SceneStateMachine::remove()
-{
-    if (!empty())
-        _scenes.top()->remove();
 }
 
 void Game::SceneStateMachine::setName(const std::string &name)
@@ -89,19 +112,33 @@ bool Game::SceneStateMachine::empty() const
     return _scenes.empty();
 }
 
-void Game::SceneStateMachine::popCallback(IScene *scene)
+void Game::SceneStateMachine::popCallback(IScene *sender, IScene *scene)
 {
     (void) scene;
+    (void) sender;
 
     pop();
 }
 
-void Game::SceneStateMachine::swapCallback(IScene *scene)
+void Game::SceneStateMachine::swapCallback(IScene *sender, IScene *scene)
 {
     if (!scene)
         return;
 
-    // Tra,sforming pointer into a shared one.
+    // Transforming pointer into a shared one.
     std::shared_ptr<IScene> ptr(scene);
     swap(ptr);
+}
+
+void Game::SceneStateMachine::pushCallback(IScene *sender, IScene *scene)
+{
+    if (!sender || !scene)
+        return;
+
+    // Deactivating scene.
+    sender->onDeactivate();
+
+    // Transforming pointer into a shared one.
+    std::shared_ptr<IScene> ptr(scene);
+    push(ptr);
 }

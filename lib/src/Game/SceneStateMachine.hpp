@@ -28,7 +28,8 @@ namespace Game
     enum scene_state
     {
         POP,
-        SWAP
+        SWAP,
+        PUSH
     };
 
     class IMediator
@@ -37,10 +38,11 @@ namespace Game
 
         /** 
          * @brief notify the mediator that a scenes changed it's state
+         * @param sender : the scene that called the notify method.
          * @param state : state of the scene
          * @param new_scene : potential new scene to push in case of a swap
          */
-        virtual void notify(scene_state state, IScene *new_scene) = 0;
+        virtual void notify(Game::IScene *sender, scene_state state, IScene *new_scene) = 0;
     };
 
     class SceneStateMachine : public IMediator
@@ -63,10 +65,11 @@ namespace Game
         // Interface
         /** 
          * @brief notify the mediator that a scenes changed it's state
+         * @param sender : the scene that called the notify method.
          * @param state : state of the scene
          * @param new_scene : potential new scene to push in case of a swap
          */
-        void notify(scene_state state, IScene *new_scene) override;
+        void notify(Game::IScene *sender, scene_state state, IScene *new_scene) override;
 
         // Running
         /** 
@@ -103,11 +106,6 @@ namespace Game
          * @brief Clear all scenes from the stack.
          */
         void clear();
-        
-        /** 
-         * @brief Use the remove methods of the scene on top of the stack.
-         */
-        void remove();
 
         /** 
          * @brief Set the name of the scene on top of the stack.
@@ -138,21 +136,30 @@ namespace Game
 
         /** 
          * @brief When the mediator is notified via the POP state, pops the scene on top of the stack.
+         * @param sender : the scene that notified the mediator.
          * @param scene : Unused parameter.
          */
-        void popCallback(IScene *scene);
+        void popCallback(IScene *sender, IScene *scene);
 
         /** 
          * @brief When the mediator is notified via the SWAP state, swaps the scene on top of the stack.
+         * @param sender : the scene that notified the mediator.
          * @param scene : the scene to swap.
          */
-        void swapCallback(IScene *scene);
+        void swapCallback(IScene *sender, IScene *scene);
+
+        /** 
+         * @brief When the mediator is notified via the PUSH state, push a new scene on top of the stack an deactivate the sender.
+         * @param sender : the scene that notified the mediator.
+         * @param scene : the scene to swap.
+         */
+        void pushCallback(IScene *sender, IScene *scene);
 
         /*! the stack of scenes */
         std::stack<std::shared_ptr<Game::IScene>> _scenes;
 
         /*! using callbacks via the states of the scenes */
-        std::unordered_map<scene_state, std::function<void(SceneStateMachine &, IScene *)>> _callbacks;
+        std::unordered_map<scene_state, std::function<void(SceneStateMachine &, IScene *, IScene *)>> _callbacks;
 
         /*! time since execution */
         float _deltaTime;
