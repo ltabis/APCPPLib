@@ -135,9 +135,6 @@ void Game::SceneStateMachine::pushCallback(IScene *sender, IScene *scene)
     if (!sender || !scene)
         return;
 
-    // Deactivating scene.
-    sender->onDeactivate();
-
     // Transforming pointer into a shared one.
     std::shared_ptr<IScene> ptr(scene);
     push(ptr);

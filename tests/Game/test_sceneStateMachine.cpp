@@ -17,6 +17,9 @@ public:
 		{
 			(void) deltaTime;
 			Debug::Logger::printDebug(Debug::INFO, "The SampleScene is being updated.", "SampleScene::update()");
+
+			_mediator->notify(this, Game::PUSH, new SampleScene("NewSampleScene", _mediator));
+			_mediator->notify(nullptr, Game::PUSH, nullptr);
 		}
 
 	void onCreate() override
@@ -55,9 +58,8 @@ TEST(SceneStateMachineTests, SceneStateMachine_basic_methods)
     // Adding a scene to the machine.
 	machine->push(scene);
 
-    // The manager has one scene in memory, updating it.
+    // The manager has one scene in memory.
     ASSERT_EQ(machine->size(), 1);
-	ASSERT_EQ(machine->update(), true);
 
     // Changing the scene's name.
 	machine->setName("Scene name changed!");
@@ -89,7 +91,6 @@ TEST(SceneStateMachineTests, SceneStateMachine_scene_manipulation)
 
     // The manager has two scenes in memory, updating the first one.
     ASSERT_EQ(machine->size(), 2);
-	ASSERT_EQ(machine->update(), true);
 
 	// Checking the name of the scene on the top of the stack.
     ASSERT_EQ(machine->name(), "SampleScene2");
@@ -124,7 +125,6 @@ TEST(SceneStateMachineTests, SceneStateMachine_advanced_scene_manipulation)
 
     // The manager has one scene in memory, updating it.
     ASSERT_EQ(machine->size(), 1);
-	ASSERT_EQ(machine->update(), true);
 
 	// Checking the name of the scene on the top of the stack.
     ASSERT_EQ(machine->name(), "SampleScene1");
@@ -134,8 +134,16 @@ TEST(SceneStateMachineTests, SceneStateMachine_advanced_scene_manipulation)
     ASSERT_EQ(machine->name(), "SampleScene2");
     ASSERT_EQ(machine->size(), 1);
 
-	// Push the first one again.
+	// Push scenes one again.
 	machine->push(scene1);
+	machine->push(scene2);
+
+	// Poping via string.
+	machine->pop("SampleScene1");
+
+	// The pop stopped at SampleScene1.
+    ASSERT_EQ(machine->size(), 2);
+    ASSERT_EQ(machine->name(), "SampleScene1");
 
 	// Poping via string.
 	machine->pop("unknown");
@@ -193,6 +201,7 @@ TEST(SceneStateMachineTests, SceneStateMachine_notify)
 
     // The interface is used to notify the scene manager that a scene stoped running.
 	std::shared_ptr<Game::IScene> scene(new Notify("Notify", ptr));
+	std::shared_ptr<Game::IScene> sampleScene(new SampleScene("SampleScene", ptr));
 
     // No scenes to update, return false.
 	ASSERT_EQ(machine->update(), false);
@@ -214,4 +223,15 @@ TEST(SceneStateMachineTests, SceneStateMachine_notify)
 	// The scene as been swaped with the SampleScene object.
     ASSERT_EQ(machine->size(), 1);
     ASSERT_EQ(machine->name(), "Notify");
+
+    // Re-adding a scene to the machine.
+	machine->push(sampleScene);
+    ASSERT_EQ(machine->size(), 2);
+
+	// Using the PUSH method of the notify method via update.
+	machine->update();
+
+	// Checking if a new scene has been added.
+    ASSERT_EQ(machine->size(), 3);
+    ASSERT_EQ(machine->name(), "NewSampleScene");
 }
