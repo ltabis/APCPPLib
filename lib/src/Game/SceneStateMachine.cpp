@@ -6,9 +6,9 @@
 
 Game::SceneStateMachine::SceneStateMachine() : _deltaTime(std::chrono::high_resolution_clock::now().time_since_epoch().count())
 {
-    _callbacks.emplace(POP, &SceneStateMachine::popCallback);
-    _callbacks.emplace(SWAP, &SceneStateMachine::swapCallback);
-    _callbacks.emplace(PUSH, &SceneStateMachine::pushCallback);
+    _callbacks.emplace(POP, std::bind(&SceneStateMachine::popCallback, this, std::placeholders::_1, std::placeholders::_2));
+    _callbacks.emplace(SWAP, std::bind(&SceneStateMachine::swapCallback, this, std::placeholders::_1, std::placeholders::_2));
+    _callbacks.emplace(PUSH, std::bind(&SceneStateMachine::pushCallback, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 Game::SceneStateMachine::~SceneStateMachine()
@@ -18,7 +18,7 @@ Game::SceneStateMachine::~SceneStateMachine()
 
 void Game::SceneStateMachine::notify(Game::IScene *sender, Game::scene_state state, Game::IScene *new_scene)
 {
-    _callbacks[state](*this, sender, new_scene);
+    _callbacks[state](sender, new_scene);
 }
 
 bool Game::SceneStateMachine::update()
