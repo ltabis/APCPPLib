@@ -16,7 +16,7 @@ enable_testing()
 
 # Required packages
 find_package(Threads)
-find_package(GTest REQUIRED)  
+find_package(GTest REQUIRED)
 
 # source files
 set(SRC lib/src/Exception/Exception.cpp
@@ -34,6 +34,7 @@ include_directories(
   lib/src/Game
   lib/src/Maths
   lib/src/Utils
+  lib/src/Algorithm
   lib/src/Exception
   lib/src/Benchmarking
   include)
