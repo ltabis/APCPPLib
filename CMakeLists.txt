@@ -19,24 +19,24 @@ find_package(Threads)
 find_package(GTest REQUIRED)  
 
 # source files
-set(SRC lib/src/Exception/Exception.cpp
-        lib/src/Log/Logger.cpp
-        lib/src/Benchmarking/Breakpoint.cpp
-        lib/src/Maths/Triangles.cpp
-        lib/src/Utils/LibraryLoader.cpp
-        lib/src/Game/SceneStateMachine.cpp
-        lib/src/Game/AScene.cpp
+set(SRC ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Exception/Exception.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Log/Logger.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Benchmarking/Breakpoint.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Maths/Triangles.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Utils/LibraryLoader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Game/SceneStateMachine.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Game/AScene.cpp
         )
 
 # Include headers to program
 include_directories(
-  lib/src/Log
-  lib/src/Game
-  lib/src/Maths
-  lib/src/Utils
-  lib/src/Exception
-  lib/src/Benchmarking
-  include)
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Log
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Game
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Maths
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Utils
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Exception
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/src/Benchmarking
+  ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Creating the library
 add_library(APCPPLib STATIC ${SRC})
@@ -48,16 +48,16 @@ set_target_properties(APCPPLib PROPERTIES VERSION ${PROJECT_VERSION})
 include(GoogleTest)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
 add_executable(unit_tests
-              tests/main.cpp
-              tests/Exception/test_exception.cpp
-              tests/Maths/test_triangles.cpp
-              tests/Utils/test_tuples.cpp
-              tests/Log/test_logger.cpp
-              tests/Game/test_sceneStateMachine.cpp)
+              ${CMAKE_CURRENT_SOURCE_DIR}/tests/main.cpp
+              ${CMAKE_CURRENT_SOURCE_DIR}/tests/Exception/test_exception.cpp
+              ${CMAKE_CURRENT_SOURCE_DIR}/tests/Maths/test_triangles.cpp
+              ${CMAKE_CURRENT_SOURCE_DIR}/tests/Utils/test_tuples.cpp
+              ${CMAKE_CURRENT_SOURCE_DIR}/tests/Log/test_logger.cpp
+              ${CMAKE_CURRENT_SOURCE_DIR}/tests/Game/test_sceneStateMachine.cpp)
 
 ## Linking libraries
 target_link_libraries(APCPPLib ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(unit_tests PUBLIC
-                      APCPPLib
+                      ${CMAKE_CURRENT_SOURCE_DIR}/APCPPLib
                       ${GTEST_LIBRARIES} pthread
                       ${CMAKE_THREAD_LIBS_INIT})

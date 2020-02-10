@@ -54,7 +54,6 @@ cmake-build-debug/
 unit_tests
 apcpplib.conf
 test.sh
-main.cpp
 
 tests/IDisplayModule.hpp
 tests/SFML.cpp
