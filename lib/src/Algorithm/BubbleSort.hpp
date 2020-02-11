@@ -12,7 +12,7 @@ namespace Algorithm
         template<typename T>
         bool is_sorted(const std::vector<T> &data)
         {
-            if (!data.size())
+            if (data.empty())
                 return true;
         
             // Getting the first element.
@@ -48,5 +48,12 @@ namespace Algorithm
                 }
             }
         }
+    }
+
+    // To be tested.
+    template<typename T>
+    void less_sort(std::vector<T> &data)
+    {
+        std::sort(data.begin(), data.end(), std::less<T>());
     }
 }
