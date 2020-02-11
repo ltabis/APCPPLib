@@ -159,7 +159,7 @@ namespace Game
         std::stack<std::shared_ptr<Game::IScene>> _scenes;
 
         /*! using callbacks via the states of the scenes */
-        std::unordered_map<scene_state, std::function<void(IScene *, IScene *)>> _callbacks;
+        std::unordered_map<scene_state, void (SceneStateMachine::*)(IScene *, IScene *)> _callbacks;
 
         /*! time since execution */
         float _deltaTime;
