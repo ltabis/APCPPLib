@@ -27,7 +27,7 @@ bool Game::SceneStateMachine::update()
 
     if (!empty())
     {
-        _scenes.top()->update(_deltaTime);
+        _scenes.top()->onUpdate(_deltaTime);
         return true;
     }
     return false;
