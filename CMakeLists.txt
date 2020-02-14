@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 set(CMAKE_CXX_STANDARD 17)
-project(APCPPLib VERSION 1.0 DESCRIPTION "A library designed to help you during the developpement of your C++ projects")
+project(APCPPLib VERSION 0.5.0 DESCRIPTION "A library designed to help you during the developpement of your C++ projects")
 
 ## Conan setup
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
