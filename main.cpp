@@ -10,7 +10,7 @@ class SampleScene : public Game::AScene
 public:
 	SampleScene(const std::string &name, std::shared_ptr<Game::IMediator> mediator) : AScene(name, mediator) {}
 
-	void update(float deltaTime) override
+	void onUpdate(float deltaTime) override
 		{
 			(void) deltaTime;
 
