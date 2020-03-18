@@ -9,23 +9,23 @@
 #include "Logger.hpp"
 
 Debug::Logger::Logger(char flags, mode mode)
-    : _mode(mode),
-      _flags(flags),
-      _bNotified(false),
-      _bIsWorkerActive(true),
-      _time(std::chrono::high_resolution_clock::now())
+    : _mode            { mode                                      }
+    , _flags           { flags                                     }
+    , _bNotified       { false                                     }
+    , _bIsWorkerActive { true                                      }
+    , _time            { std::chrono::high_resolution_clock::now() }
 {
     // Creating a new worker thread that will print content.
     _worker = std::thread(&Logger::writeContent, this);
 }
 
 Debug::Logger::Logger(const std::string &filePath, char flags, mode mode)
-    : _mode(mode),
-      _flags(flags),
-      _file(filePath),
-      _bNotified(false),
-      _bIsWorkerActive(true),
-      _time(std::chrono::high_resolution_clock::now())
+    : _mode            { mode                                      }
+    , _flags           { flags                                     }
+    , _file            { filePath                                  }
+    , _bNotified       { false                                     }
+    , _bIsWorkerActive { true                                      }
+    , _time            { std::chrono::high_resolution_clock::now() }
 {
     // Creating a new worker thread that will print content.
     _worker = std::thread(&Logger::writeContent, this);
@@ -33,12 +33,12 @@ Debug::Logger::Logger(const std::string &filePath, char flags, mode mode)
 
 Debug::Logger::~Logger()
 {
-    if (_file.is_open())
-        _file.close();
     _bNotified = true;
     _bIsWorkerActive = false;
     _condVar.notify_one();
     _worker.join();
+    if (_file.is_open())
+        _file.close();
 }
 
 void Debug::Logger::writeContent()

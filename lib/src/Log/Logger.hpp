@@ -78,24 +78,8 @@ namespace Debug
                 }
 
                 // Notify the worker thread that we are done pushing requests to the stack.
-                instance->_condVar.notify_one();
                 instance->_bNotified = true;
-            }
-
-            /** 
-             * @brief Print a message on the screen via a different thread.
-             * @param message : the message that will be displayed.
-             */
-            static void printDebug(const std::string &message)
-            {
-                Logger *instance = getInstance();
-
-                // Printing the message to cout or writing it to the current opened file.
-                if (instance->_mode == STANDARD)
-                    std::cout << message << std::endl;
-                else if (instance->_mode == FILE && instance->_file.is_open())
-                    instance->_file << message << std::endl;
-
+                instance->_condVar.notify_one();
             }
 
             /** 
@@ -169,6 +153,22 @@ namespace Debug
              * @param mode : mode of the logger.
              */
             Logger(char flags = Flags::all_on, mode mode = STANDARD);
+
+            /** 
+             * @brief Print a message on the screen via a different thread.
+             * @param message : the message that will be displayed.
+             */
+            static void printDebug(const std::string &message)
+            {
+                Logger *instance = getInstance();
+
+                // Printing the message to cout or writing it to the current opened file.
+                if (instance->_mode == STANDARD)
+                    std::cout << message << std::endl;
+                else if (instance->_mode == FILE && instance->_file.is_open())
+                    instance->_file << message << std::endl;
+
+            }
 
             /** 
              * @brief Emptying the task queue by calling the printDebug method.
