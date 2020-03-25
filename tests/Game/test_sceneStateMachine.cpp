@@ -1,5 +1,5 @@
 //
-// Created by tabis on 22/01/2020.
+// Created by tabis on 10/10/2019.
 //
 
 #include <gtest/gtest.h>
@@ -8,18 +8,23 @@
 #include "Logger.hpp"
 #include "AScene.hpp"
 
-class SampleScene : public Game::AScene
+class SampleScene : public Scenes::AScene
 {
 public:
-	SampleScene(const std::string &name, std::shared_ptr<Game::IMediator> mediator) : AScene(name, mediator) {}
+	SampleScene() : Scenes::AScene() {};
+
+	~SampleScene() = default;
 
 	void onUpdate(float deltaTime) override
 		{
 			(void) deltaTime;
 			Debug::Logger::printDebug(Debug::INFO, "The SampleScene is being updated.", "SampleScene::update()");
 
-			_mediator->notify(this, Game::PUSH, new SampleScene("NewSampleScene", _mediator));
-			_mediator->notify(nullptr, Game::PUSH, nullptr);
+			IScene *newscene = new SampleScene;
+			newscene->setName("NewSampleScene");
+
+			_mediator->notify(this, Module::PUSH, newscene);
+			_mediator->notify(nullptr, Module::PUSH, nullptr);
 		}
 
 	void onCreate() override
@@ -46,11 +51,10 @@ public:
 TEST(SceneStateMachineTests, SceneStateMachine_basic_methods)
 {
     // Creating a new scene state machine, casting it into the IMediator interface.
-	std::shared_ptr<Game::SceneStateMachine> machine = std::make_shared<Game::SceneStateMachine>(Game::SceneStateMachine());
-	std::shared_ptr<Game::IMediator> ptr(machine);
+	std::shared_ptr<Module::SceneStateMachine> machine(new Module::SceneStateMachine);
 
     // The interface is used to notify the scene manager that a scene stoped running.
-	std::shared_ptr<Game::IScene> scene(new SampleScene("SampleScene", ptr));
+	std::shared_ptr<Scenes::IScene> scene(new SampleScene);
 
     // No scenes to update, return false.
 	ASSERT_EQ(machine->update(), false);
@@ -75,12 +79,15 @@ TEST(SceneStateMachineTests, SceneStateMachine_basic_methods)
 TEST(SceneStateMachineTests, SceneStateMachine_scene_manipulation)
 {
     // Creating a new scene state machine, casting it into the IMediator interface.
-	std::shared_ptr<Game::SceneStateMachine> machine = std::make_shared<Game::SceneStateMachine>(Game::SceneStateMachine());
-	std::shared_ptr<Game::IMediator> ptr(machine);
+	std::shared_ptr<Module::SceneStateMachine> machine(new Module::SceneStateMachine);
+	std::shared_ptr<Module::IMediator> ptr(machine);
 
     // The interface is used to notify the scene manager that a scene stoped running.
-	std::shared_ptr<Game::IScene> scene1(new SampleScene("SampleScene1", ptr));
-	std::shared_ptr<Game::IScene> scene2(new SampleScene("SampleScene2", ptr));
+	std::shared_ptr<Scenes::IScene> scene1(new SampleScene);
+	std::shared_ptr<Scenes::IScene> scene2(new SampleScene);
+
+	scene1->setName("SampleScene1");
+	scene2->setName("SampleScene2");
 
     // No scenes to update, return false.
 	ASSERT_EQ(machine->update(), false);
@@ -110,12 +117,15 @@ TEST(SceneStateMachineTests, SceneStateMachine_scene_manipulation)
 TEST(SceneStateMachineTests, SceneStateMachine_advanced_scene_manipulation)
 {
     // Creating a new scene state machine, casting it into the IMediator interface.
-	std::shared_ptr<Game::SceneStateMachine> machine = std::make_shared<Game::SceneStateMachine>(Game::SceneStateMachine());
-	std::shared_ptr<Game::IMediator> ptr(machine);
+	std::shared_ptr<Module::SceneStateMachine> machine(new Module::SceneStateMachine);
+	std::shared_ptr<Module::IMediator> ptr(machine);
 
     // The interface is used to notify the scene manager that a scene stoped running.
-	std::shared_ptr<Game::IScene> scene1(new SampleScene("SampleScene1", ptr));
-	std::shared_ptr<Game::IScene> scene2(new SampleScene("SampleScene2", ptr));
+	std::shared_ptr<Scenes::IScene> scene1(new SampleScene);
+	std::shared_ptr<Scenes::IScene> scene2(new SampleScene);
+
+	scene1->setName("SampleScene1");
+	scene2->setName("SampleScene2");
 
     // No scenes to update, return false.
 	ASSERT_EQ(machine->update(), false);
@@ -152,10 +162,10 @@ TEST(SceneStateMachineTests, SceneStateMachine_advanced_scene_manipulation)
     ASSERT_EQ(machine->size(), 0);
 }
 
-class Notify : public Game::AScene
+class Notify : public Scenes::AScene
 {
 public:
-	Notify(const std::string &name, std::shared_ptr<Game::IMediator> mediator) : AScene(name, mediator) {}
+	Notify() : AScene() {}
 
 	void onUpdate(float deltaTime) override
 		{
@@ -164,7 +174,7 @@ public:
 			Debug::Logger::printDebug(Debug::INFO, "The Notify is being updated, poping the scene.", "Notify::update()");
 
 			// calling the mediator for the sake of the example.
-			_mediator->notify(this, Game::POP, nullptr);
+			_mediator->notify(this, Module::POP, nullptr);
 		}
 
 	void onCreate() override
@@ -182,8 +192,11 @@ public:
 			Debug::Logger::printDebug(Debug::INFO, "onActivate method called.", "Notify::onActivate()");
 
 			// Swaping, for the sake of the example.
-			_mediator->notify(this, Game::SWAP, nullptr);
-			_mediator->notify(this, Game::SWAP, new SampleScene("SampleScene", _mediator));
+			_mediator->notify(this, Module::SWAP, nullptr);
+
+			Scenes::IScene *scene(new SampleScene);
+			scene->setName("Notify");
+			_mediator->notify(this, Module::SWAP, scene);
 		}
 
 	void onDeactivate() override
@@ -196,12 +209,15 @@ public:
 TEST(SceneStateMachineTests, SceneStateMachine_notify)
 {
     // Creating a new scene state machine, casting it into the IMediator interface.
-	std::shared_ptr<Game::SceneStateMachine> machine = std::make_shared<Game::SceneStateMachine>(Game::SceneStateMachine());
-	std::shared_ptr<Game::IMediator> ptr(machine);
+	std::shared_ptr<Module::SceneStateMachine> machine(new Module::SceneStateMachine);
+	std::shared_ptr<Module::IMediator> ptr(machine);
 
     // The interface is used to notify the scene manager that a scene stoped running.
-	std::shared_ptr<Game::IScene> scene(new Notify("Notify", ptr));
-	std::shared_ptr<Game::IScene> sampleScene(new SampleScene("SampleScene", ptr));
+	std::shared_ptr<Scenes::IScene> scene(new Notify);
+	std::shared_ptr<Scenes::IScene> sampleScene(new SampleScene);
+
+	scene->setName("Notify");
+	sampleScene->setName("SampleScene");
 
     // No scenes to update, return false.
 	ASSERT_EQ(machine->update(), false);
@@ -218,9 +234,6 @@ TEST(SceneStateMachineTests, SceneStateMachine_notify)
 
     // Re-adding a scene to the machine.
 	machine->push(scene);
-    ASSERT_EQ(machine->size(), 1);
-
-	// The scene as been swaped with the SampleScene object.
     ASSERT_EQ(machine->size(), 1);
     ASSERT_EQ(machine->name(), "Notify");
 

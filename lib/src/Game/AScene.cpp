@@ -1,14 +1,18 @@
 
 #include "AScene.hpp"
 
-Game::AScene::AScene(const std::string &name, std::shared_ptr<Game::IMediator> &mediator) : _name(name), _mediator(mediator) {}
+void Scenes::AScene::onInit(const std::string &name, Module::IMediator *mediator)
+{
+    _name = name;
+    _mediator = mediator;
+}
 
-void Game::AScene::setName(const std::string &name)
+void Scenes::AScene::setName(const std::string &name)
 {
     _name = name;
 }
 
-std::string Game::AScene::name() const
+std::string Scenes::AScene::name() const
 {
     return _name;
 }
